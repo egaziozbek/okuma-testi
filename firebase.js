@@ -1,0 +1,1 @@
+export const firebaseApp = {}; // örnek firebase yapılandırması
