@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Öğrenci Giriş - Okuma Testi</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   <style>
@@ -76,8 +77,7 @@
 </head>
 <body>
   <div class="container">
-    <<img src="Pelikan Eğitim Kurumları-2.jpg" alt="Pelikan Logo" class="logo" style="width: 150px; height: auto;">
-
+    <img src="logo.jpg" alt="Pelikan Logo" class="logo">
     <h1>Hızlı Okuma ve Okuduğunu Anlama Ölçüm Metni</h1>
     <p class="description">Bu test, öğrencinin okuma hızını ve anlama düzeyini ölçmek amacıyla hazırlanmıştır. Lütfen bilgilerinizi girerek doğrulama adımını tamamlayın.</p>
 
@@ -102,13 +102,10 @@
     </form>
   </div>
 
-  <!-- Firebase bağlantısı -->
   <script type="module" src="firebase.js"></script>
 
-  <!-- Doğrulama işlemleri -->
   <script type="module">
     import { firebaseAuth, RecaptchaVerifier, signInWithPhoneNumber } from './firebase.js';
-
     let confirmationResult;
 
     window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
@@ -121,8 +118,12 @@
 
     window.sendCode = async function() {
       const phoneNumber = document.getElementById('phone').value;
-      confirmationResult = await signInWithPhoneNumber(firebaseAuth, phoneNumber, window.recaptchaVerifier);
-      alert("Doğrulama kodu gönderildi.");
+      try {
+        confirmationResult = await signInWithPhoneNumber(firebaseAuth, phoneNumber, window.recaptchaVerifier);
+        alert("Doğrulama kodu gönderildi.");
+      } catch (error) {
+        alert("Kod gönderilemedi: " + error.message);
+      }
     }
 
     window.verifyCode = async function() {
