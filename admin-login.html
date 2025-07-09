@@ -4,7 +4,64 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Girişi</title>
-  <!-- (stil kısmı burada olacak, zaten mevcut) -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #5e35b1, #fb8c00);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-box {
+      background-color: white;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      color: #1a237e;
+    }
+
+    .login-box input[type="email"],
+    .login-box input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin-top: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .login-box button {
+      width: 100%;
+      background-color: #fb8c00;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .login-box button:hover {
+      background-color: #f57c00;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      display: none;
+    }
+  </style>
 </head>
 <body>
   <div class="login-box">
@@ -17,43 +74,8 @@
     <p class="error" id="errorMsg">Giriş başarısız. Bilgilerinizi kontrol edin.</p>
   </div>
 
-  <!-- 🔽 Kodunu buraya ekle -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-      authDomain: "okuma-testi.firebaseapp.com",
-      projectId: "okuma-testi",
-      storageBucket: "okuma-testi.firebasestorage.app",
-      messagingSenderId: "820936161658",
-      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-      measurementId: "G-2WBL96ETV1"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const form = document.getElementById("loginForm");
-    const errorMsg = document.getElementById("errorMsg");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log("Giriş başarılı:", user.email);
-        window.location.href = "admin.html";
-      } catch (error) {
-        console.error("Hata kodu:", error.code);
-        console.error("Açıklama:", error.message);
-        errorMsg.style.display = "block";
-      }
-    });
-  </script>
+  <!-- Firebase SDK ve Debug Scriptlerini Harici Dosyadan Yükle -->
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="admin-login-debug.js"></script>
 </body>
 </html>
