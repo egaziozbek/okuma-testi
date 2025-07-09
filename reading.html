@@ -9,7 +9,7 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-     background: linear-gradient(to right, #1A237E, #FFA000);
+      background: linear-gradient(to right, #1A237E, #FFA000);
       color: #333;
       display: flex;
       flex-direction: column;
@@ -90,8 +90,19 @@
     function finishReading() {
       clearInterval(timerInterval);
       const totalTime = Math.floor((Date.now() - startTime) / 1000);
-      localStorage.setItem("readingTime", totalTime);
-      window.location.href = "questions.html";
+      const metin = document.getElementById("readingText").innerText;
+
+      // Şimdilik örnek olarak sabit başarı verisi kullanıyoruz
+      const dogru = 8;
+      const yanlis = 2;
+
+      // Gerekirse öğrenci bilgileri de eklenebilir
+      const ad = "Ali Yılmaz";
+      const yas = 12;
+      const tel = "05551234567";
+
+      const url = `result.html?metin=${encodeURIComponent(metin)}&sure=${totalTime}&dogru=${dogru}&yanlis=${yanlis}&ad=${encodeURIComponent(ad)}&yas=${yas}&tel=${tel}`;
+      window.location.href = url;
     }
   </script>
 </body>
