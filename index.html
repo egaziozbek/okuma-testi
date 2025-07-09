@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -10,7 +9,7 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to bottom right, #0D47A1, #1976D2);
+      background: linear-gradient(to right, #1A237E, #FFA000);;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -79,65 +78,29 @@
   <div class="container">
     <img src="logo.jpg" alt="Pelikan Logo" class="logo">
     <h1>Hızlı Okuma ve Okuduğunu Anlama Ölçüm Metni</h1>
-    <p class="description">Bu test, öğrencinin okuma hızını ve anlama düzeyini ölçmek amacıyla hazırlanmıştır. Lütfen bilgilerinizi girerek doğrulama adımını tamamlayın.</p>
+    <p class="description">Bu test, öğrencinin okuma hızını ve anlama düzeyini ölçmek amacıyla hazırlanmıştır. Lütfen bilgilerinizi girerek devam edin.</p>
 
     <form id="studentForm">
-      <label>Ad Soyad:</label>
-      <input type="text" id="name" required>
+      <label for="name">Ad Soyad:</label>
+      <input type="text" id="name" name="name" required minlength="3">
 
-      <label>Yaş / Sınıf:</label>
-      <input type="text" id="grade" required>
+      <label for="grade">Yaş / Sınıf:</label>
+      <input type="text" id="grade" name="grade" required minlength="1">
 
-      <label>Cep Telefonu:</label>
-      <input type="tel" id="phone" placeholder="+90 5xx xxx xx xx" required>
-
-      <div id="recaptcha-container" style="margin-top: 1rem;"></div>
-
-      <button type="button" onclick="sendCode()">Doğrulama Kodu Gönder</button>
-
-      <label>Gelen Kod:</label>
-      <input type="text" id="verificationCode">
-
-      <button type="button" onclick="verifyCode()">Doğrula ve Devam Et</button>
+      <button type="submit">Başla</button>
     </form>
   </div>
+  <footer>
+    &copy; 2025 Tüm hakları saklıdır. Bu uygulama Pelikan Eğitim Kurumları'na aittir.
+  </footer>
 
-  <script type="module" src="firebase.js"></script>
-
-  <script type="module">
-    import { firebaseAuth, RecaptchaVerifier, signInWithPhoneNumber } from './firebase.js';
-    let confirmationResult;
-
-    window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
-      'size': 'normal',
-      'callback': (response) => {},
-      'expired-callback': () => {
-        alert("reCAPTCHA süresi doldu, lütfen yeniden deneyin.");
-      }
-    }, firebaseAuth);
-
-    window.sendCode = async function() {
-      const phoneNumber = document.getElementById('phone').value;
-      try {
-        confirmationResult = await signInWithPhoneNumber(firebaseAuth, phoneNumber, window.recaptchaVerifier);
-        alert("Doğrulama kodu gönderildi.");
-      } catch (error) {
-        alert("Kod gönderilemedi: " + error.message);
-      }
-    }
-
-    window.verifyCode = async function() {
-      const code = document.getElementById('verificationCode').value;
-      try {
-        await confirmationResult.confirm(code);
-        localStorage.setItem('studentName', document.getElementById('name').value);
-        localStorage.setItem('studentGrade', document.getElementById('grade').value);
-        localStorage.setItem('studentPhone', document.getElementById('phone').value);
-        window.location.href = 'reading.html';
-      } catch (error) {
-        alert("Kod doğrulama başarısız. Lütfen tekrar deneyin.");
-      }
-    }
+  <script>
+    document.getElementById('studentForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      localStorage.setItem('studentName', document.getElementById('name').value);
+      localStorage.setItem('studentGrade', document.getElementById('grade').value);
+      window.location.href = 'reading.html';
+    });
   </script>
 </body>
 </html>
