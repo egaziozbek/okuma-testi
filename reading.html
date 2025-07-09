@@ -74,36 +74,34 @@
   </div>
 
   <script>
-    let startTime, timerInterval;
+  let startTime, timerInterval;
 
-    function startReading() {
-      startTime = Date.now();
-      document.getElementById('startBtn').style.display = 'none';
-      document.getElementById('finishBtn').style.display = 'inline-block';
+  function startReading() {
+    startTime = Date.now();
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('finishBtn').style.display = 'inline-block';
 
-      timerInterval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        document.getElementById("timer").innerText = "Süre: " + elapsed + " saniye";
-      }, 1000);
-    }
+    timerInterval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTime) / 1000);
+      document.getElementById("timer").innerText = "Süre: " + elapsed + " saniye";
+    }, 1000);
+  }
 
-    function finishReading() {
-      clearInterval(timerInterval);
-      const totalTime = Math.floor((Date.now() - startTime) / 1000);
-      const metin = document.getElementById("readingText").innerText;
+  function finishReading() {
+    clearInterval(timerInterval);
+    const totalTime = Math.floor((Date.now() - startTime) / 1000);
 
-      // Şimdilik örnek olarak sabit başarı verisi kullanıyoruz
-      const dogru = 8;
-      const yanlis = 2;
+    // Metindeki kelime sayısını al
+    const metin = document.getElementById("readingText").innerText;
+    const kelimeler = metin.trim().split(/\s+/);
+    const kelimeSayisi = kelimeler.length;
 
-      // Gerekirse öğrenci bilgileri de eklenebilir
-      const ad = "Ali Yılmaz";
-      const yas = 12;
-      const tel = "05551234567";
+    // LocalStorage'a kaydet
+    localStorage.setItem("readingTime", totalTime);
+    localStorage.setItem("kelimeSayisi", kelimeSayisi);
 
-      const url = `result.html?metin=${encodeURIComponent(metin)}&sure=${totalTime}&dogru=${dogru}&yanlis=${yanlis}&ad=${encodeURIComponent(ad)}&yas=${yas}&tel=${tel}`;
-      window.location.href = url;
-    }
-  </script>
+    window.location.href = "result.html";
+  }
+</script>
 </body>
 </html>
