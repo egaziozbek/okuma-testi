@@ -3,89 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Okuma Sayfası</title>
+  <title>Sonuç Ekranı</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #1A237E, #FFA000);
       margin: 0;
       padding: 2rem;
-      color: #333;
       display: flex;
       justify-content: center;
     }
     .container {
-      background-color: #fff;
+      background: #fff;
       padding: 2rem;
-      border-radius: 1rem;
+      border-radius: 12px;
       max-width: 700px;
       width: 100%;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
     h2 {
-      color: #0D47A1;
+      text-align: center;
+      color: #1A237E;
     }
-    #readingText {
-      text-align: justify;
-      line-height: 1.6;
-      font-size: 1.1rem;
-    }
-    button {
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-top: 20px;
-      padding: 10px 20px;
-      background: #F57C00;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
     }
-    #timer {
-      margin-top: 15px;
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #1A237E;
+      color: white;
+    }
+    .demo-button {
+      margin-top: 20px;
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #FFA000;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
       font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Okuma Metni</h2>
-    <p id="readingText">
-      Bir sabah Gregor Samsa rahatsız edici rüyalarından uyandığında kendini yatağında dev bir böceğe dönüşmüş olarak buldu. Sert sırtının üzerinde yatıyor, başını biraz kaldırdığında kahverengi, kubbe şeklindeki karnını ve üzerinde zor bela duran çok sayıda bacağının kemiksi sertliğini görüyordu.
-    </p>
+    <h2>Test Sonuçları</h2>
+    <table>
+      <tr>
+        <th>Okuma Hızı (kelime/dk)</th>
+        <th>Doğru Sayısı</th>
+        <th>Yanlış Sayısı</th>
+        <th>Başarı Yüzdesi</th>
+      </tr>
+      <tr>
+        <td id="okumaHiziCell">-</td>
+        <td id="dogruCell">0</td>
+        <td id="yanlisCell">0</td>
+        <td id="yuzdeCell">-</td>
+      </tr>
+    </table>
 
-    <button onclick="startReading()" id="startBtn">Okumaya Başla</button>
-    <button onclick="finishReading()" id="finishBtn" style="display:none;">Bitirdim</button>
-
-    <div id="timer">Süre: 0 saniye</div>
+    <div style="text-align:center;">
+      <a href="demo-kayit.html" class="demo-button">Ücretsiz Online Demo Ders Kayıt</a>
+    </div>
   </div>
 
   <script>
-    let startTime, interval;
+    const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
+    const sure = parseInt(localStorage.getItem("readingTime")) || 1;
 
-    function startReading() {
-      startTime = Date.now();
-      document.getElementById('startBtn').style.display = "none";
-      document.getElementById('finishBtn').style.display = "inline-block";
+    const okumaHizi = Math.round((kelimeSayisi * 60) / sure);
 
-      interval = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-        document.getElementById("timer").textContent = `Süre: ${elapsed} saniye`;
-      }, 1000);
-    }
+    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
 
-    function finishReading() {
-      clearInterval(interval);
-      const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
-
-      // Metindeki kelime sayısını al
-      const text = document.getElementById("readingText").innerText;
-      const kelimeSayisi = text.trim().split(/\s+/).length;
-
-      // localStorage'a kaydet
-      localStorage.setItem("readingTime", totalSeconds);
-      localStorage.setItem("kelimeSayisi", kelimeSayisi);
-
-      window.location.href = "result.html";
-    }
+    // Diğer hücreler şimdilik sabit
+    document.getElementById("dogruCell").textContent = 0;
+    document.getElementById("yanlisCell").textContent = 0;
+    document.getElementById("yuzdeCell").textContent = "-";
   </script>
 </body>
 </html>
