@@ -57,6 +57,19 @@
   </table>
 
   <script type="module">
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+// Firebase başlatılmış olmalı (initializeApp ile)
+// ...
+
+const auth = getAuth();
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    // Kullanıcı oturum açmamışsa giriş ekranına yönlendir
+    window.location.href = "admin-login.html";
+  }
+});
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
