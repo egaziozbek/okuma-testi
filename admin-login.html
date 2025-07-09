@@ -1,110 +1,38 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Giriş</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #1A237E, #FFA000);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
+// 1. Güncellenmiş Giriş Kodunu Kullanalım
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-    .login-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      width: 300px;
-      text-align: center;
-    }
+const firebaseConfig = {
+  apiKey: "AIzaSyCLp-t81vUS5L1Dr76YKszeG1clLhU0GZQ",
+  authDomain: "okuma-testi.firebaseapp.com",
+  projectId: "okuma-testi",
+  storageBucket: "okuma-testi.appspot.com",
+  messagingSenderId: "829036161658",
+  appId: "1:829036161658:web:03f8891fa340444667ec3",
+  measurementId: "G-TTKE36VBT9"
+};
 
-    h2 {
-      margin-bottom: 20px;
-      color: #1A237E;
-    }
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-    }
+// 2. Formu Dinleyip Giriş Kontrolü
+const form = document.getElementById("loginForm");
+const errorMsg = document.getElementById("errorMsg");
 
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #FFA000;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-    button:hover {
-      background-color: #fb8c00;
-    }
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-    .error {
-      color: red;
-      margin-top: 10px;
-      display: none;
-    }
-  </style>
-</head>
-<body>
-  <div class="login-box">
-    <h2>Admin Giriş</h2>
-    <form id="loginForm">
-      <input type="email" id="email" placeholder="E-posta" required />
-      <input type="password" id="password" placeholder="Şifre" required />
-      <button type="submit">Giriş Yap</button>
-    </form>
-    <p class="error" id="errorMsg">Giriş başarısız. Bilgilerinizi kontrol edin.</p>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-    // 🔁 BURAYI kendi Firebase projenle değiştir
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-      authDomain: "okuma-testi.firebaseapp.com",
-      projectId: "okuma-testi",
-      storageBucket: "okuma-testi.firebasestorage.app",
-      messagingSenderId: "820936161658",
-      appId: "1:820936161658:web:03f8891fa43044d4667ec3",
-      measurementId: "G-TTKE36VBT9"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const form = document.getElementById("loginForm");
-    const errorMsg = document.getElementById("errorMsg");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "admin.html";
-      } catch (error) {
-        console.error(error);
-        errorMsg.style.display = "block";
-      }
-    });
-  </script>
-</body>
-</html>
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    console.log("Giriş başarılı:", user.email);
+    window.location.href = "admin.html";
+  } catch (error) {
+    console.error("Hata kodu:", error.code);
+    console.error("Açıklama:", error.message);
+    errorMsg.style.display = "block";
+  }
+});
