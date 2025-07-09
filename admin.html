@@ -38,11 +38,27 @@
       font-weight: bold;
       display: none;
     }
+    .metin-btn {
+      margin: 20px auto;
+      display: block;
+      background-color: #1A237E;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .metin-btn:hover {
+      background-color: #303f9f;
+    }
   </style>
 </head>
 <body>
   <h2>Demo Ders Kayıtları</h2>
   <p id="yetkisiz">Bu sayfayı görüntüleme yetkiniz yok.</p>
+
+  <button class="metin-btn" onclick="window.location.href='admin-text-edit.html'">Okuma Metnini Düzenle</button>
 
   <table id="kayitTablosu" style="display:none;">
     <thead>
@@ -81,7 +97,6 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        // Kullanıcı oturum açmamışsa giriş sayfasına yönlendir
         window.location.href = "admin-login.html";
         return;
       }
@@ -103,7 +118,6 @@
           });
           kayitTablosu.style.display = "table";
         } else {
-          // Admin değilse erişim reddedilir
           yetkisizYazi.style.display = "block";
         }
       } catch (err) {
