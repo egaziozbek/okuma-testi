@@ -4,13 +4,13 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
 
 // Senin Firebase yapılandırman
 const firebaseConfig = {
-  apiKey: "AIzaSyC6K7-iL42jDIIvtZcCYu5DJnvE912JMLY",
-  authDomain: "pelikankolejidemo.firebaseapp.com",
-  projectId: "pelikankolejidemo",
-  storageBucket: "pelikankolejidemo.firebasestorage.app",
-  messagingSenderId: "373128273356",
-  appId: "1:373128273356:web:8f7cd57198c80414b31169",
-  measurementId: "G-YBSHMVQDF2"
+  apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+  authDomain: "okuma-testi.firebaseapp.com",
+  projectId: "okuma-testi",
+  storageBucket: "okuma-testi.firebasestorage.app",
+  messagingSenderId: "820936161658",
+  appId: "1:820936161658:web:03f8891fa43044d4667ec3",
+  measurementId: "G-TTKE36VBT9"
 };
 
 // Uygulama başlatılıyor
