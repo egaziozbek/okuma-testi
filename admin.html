@@ -1,33 +1,31 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Admin Paneli - Demo Kayıtları</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: #f4f4f4;
-      margin: 0;
-      padding: 20px;
+      padding: 30px;
     }
 
     h2 {
       text-align: center;
       color: #1A237E;
-      margin-bottom: 30px;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 30px;
       background: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
 
     th, td {
-      border: 1px solid #ddd;
       padding: 12px;
+      border: 1px solid #ccc;
       text-align: center;
     }
 
@@ -40,16 +38,19 @@
       background-color: #f9f9f9;
     }
 
-    .empty-message {
+    #yetkisiz {
+      color: red;
       text-align: center;
-      margin-top: 30px;
-      color: gray;
+      font-weight: bold;
+      display: none;
     }
   </style>
 </head>
 <body>
-  <h2>Demo Dersi Kayıt Listesi</h2>
-  <table id="recordsTable">
+  <h2>Demo Ders Kayıtları</h2>
+  <p id="yetkisiz">Bu sayfayı görüntüleme yetkiniz yok.</p>
+
+  <table id="kayitTablosu" style="display:none;">
     <thead>
       <tr>
         <th>Ad Soyad</th>
@@ -58,49 +59,66 @@
         <th>Kayıt Tarihi</th>
       </tr>
     </thead>
-    <tbody id="tableBody">
-      <!-- Veriler buraya eklenecek -->
-    </tbody>
+    <tbody id="veriBody"></tbody>
   </table>
 
-  <p id="noData" class="empty-message" style="display:none;">Henüz kayıt yapılmamış.</p>
-
   <script type="module">
-    import { db, collection, getDocs } from './firebase-config.js';
+    // Firebase SDK modülleri
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    async function listeleKayitlar() {
-      const tableBody = document.getElementById("tableBody");
-      const noData = document.getElementById("noData");
+    // 🔁 BURAYI kendi Firebase projenle doldur
+    const firebaseConfig = {
+    apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+  authDomain: "okuma-testi.firebaseapp.com",
+  projectId: "okuma-testi",
+  storageBucket: "okuma-testi.firebasestorage.app",
+  messagingSenderId: "820936161658",
+  appId: "1:820936161658:web:03f8891fa43044d4667ec3",
+  measurementId: "G-TTKE36VBT9"
+    };
 
-      try {
-        const snapshot = await getDocs(collection(db, "demo_kayitlari"));
+    // Firebase başlat
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-        if (snapshot.empty) {
-          noData.style.display = "block";
-          return;
+    const yetkisizYazi = document.getElementById("yetkisiz");
+    const kayitTablosu = document.getElementById("kayitTablosu");
+    const veriBody = document.getElementById("veriBody");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const idTokenResult = await user.getIdTokenResult();
+        const claims = idTokenResult.claims;
+
+        if (claims.admin === true) {
+          // Admin yetkisi varsa kayıtları getir
+          const snapshot = await getDocs(collection(db, "demo_kayitlari"));
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+              <td>${data.name || "-"}</td>
+              <td>${data.age || "-"}</td>
+              <td>${data.phone || "-"}</td>
+              <td>${new Date(data.kayitTarihi).toLocaleString()}</td>
+            `;
+
+            veriBody.appendChild(tr);
+          });
+
+          kayitTablosu.style.display = "table";
+        } else {
+          yetkisizYazi.style.display = "block";
         }
-
-        snapshot.forEach(doc => {
-          const data = doc.data();
-          const row = document.createElement("tr");
-
-          row.innerHTML = `
-            <td>${data.name || "-"}</td>
-            <td>${data.age || "-"}</td>
-            <td>${data.phone || "-"}</td>
-            <td>${new Date(data.kayitTarihi).toLocaleString()}</td>
-          `;
-
-          tableBody.appendChild(row);
-        });
-      } catch (error) {
-        console.error("Veri çekme hatası:", error);
-        noData.textContent = "Kayıtlar yüklenirken hata oluştu.";
-        noData.style.display = "block";
+      } else {
+        // Giriş yapılmamışsa yönlendir
+        window.location.href = "admin-login.html";
       }
-    }
-
-    listeleKayitlar();
+    });
   </script>
 </body>
 </html>
