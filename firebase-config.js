@@ -3,14 +3,16 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Senin Firebase yapılandırman
-const firebaseConfig = {
-   apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+export const firebaseConfig = {
+  apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
   authDomain: "okuma-testi.firebaseapp.com",
   projectId: "okuma-testi",
-  storageBucket: "okuma-testi.firebasestorage.app",
+  storageBucket: "okuma-testi.appspot.com",
   messagingSenderId: "820936161658",
   appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
   measurementId: "G-2WBL96ETV1"
+};
+
 };
 
 // Uygulama başlatılıyor
