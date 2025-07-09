@@ -9,12 +9,10 @@
       background: #f4f4f4;
       padding: 30px;
     }
-
     h2 {
       text-align: center;
       color: #1A237E;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -22,22 +20,18 @@
       background: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
     th, td {
       padding: 12px;
       border: 1px solid #ccc;
       text-align: center;
     }
-
     th {
       background-color: #1A237E;
       color: white;
     }
-
     tr:nth-child(even) {
       background-color: #f9f9f9;
     }
-
     #yetkisiz {
       color: red;
       text-align: center;
@@ -63,23 +57,20 @@
   </table>
 
   <script type="module">
-    // Firebase SDK modülleri
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    // 🔁 BURAYI kendi Firebase projenle doldur
     const firebaseConfig = {
- apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-  authDomain: "okuma-testi.firebaseapp.com",
-  projectId: "okuma-testi",
-  storageBucket: "okuma-testi.firebasestorage.app",
-  messagingSenderId: "820936161658",
-  appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-  measurementId: "G-2WBL96ETV1"
+      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+      authDomain: "okuma-testi.firebaseapp.com",
+      projectId: "okuma-testi",
+      storageBucket: "okuma-testi.firebasestorage.app",
+      messagingSenderId: "820936161658",
+      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
+      measurementId: "G-2WBL96ETV1"
     };
 
-    // Firebase başlat
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -89,60 +80,38 @@
     const veriBody = document.getElementById("veriBody");
 
     onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const idTokenResult = await user.getIdTokenResult();
-        const claims = idTokenResult.claims;
+      if (!user) {
+        // Oturum açılmamışsa login sayfasına yönlendir
+        window.location.href = "admin-login.html";
+        return;
+      }
 
-        if (claims.admin === true) {
-          // Admin yetkisi varsa kayıtları getir
+      // Admin yetkisini kontrol et
+      const tokenResult = await user.getIdTokenResult();
+      if (tokenResult.claims.admin === true) {
+        try {
           const snapshot = await getDocs(collection(db, "demo_kayitlari"));
           snapshot.forEach((doc) => {
             const data = doc.data();
             const tr = document.createElement("tr");
-
             tr.innerHTML = `
               <td>${data.name || "-"}</td>
               <td>${data.age || "-"}</td>
               <td>${data.phone || "-"}</td>
               <td>${new Date(data.kayitTarihi).toLocaleString()}</td>
             `;
-
             veriBody.appendChild(tr);
           });
-
           kayitTablosu.style.display = "table";
-        } else {
+        } catch (err) {
+          yetkisizYazi.textContent = "Veriler yüklenemedi: " + err.message;
           yetkisizYazi.style.display = "block";
         }
       } else {
-        // Giriş yapılmamışsa yönlendir
-        window.location.href = "admin-login.html";
+        // Admin değilse mesaj göster
+        yetkisizYazi.style.display = "block";
       }
     });
   </script>
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-    authDomain: "okuma-testi.firebaseapp.com",
-    projectId: "okuma-testi",
-    storageBucket: "okuma-testi.firebasestorage.app",
-    messagingSenderId: "820936161658",
-    appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-    measurementId: "G-2WBL96ETV1"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      // Kullanıcı oturum açmamışsa, admin-login.html'e yönlendir
-      window.location.href = "admin-login.html";
-    }
-  });
-</script>
 </body>
 </html>
