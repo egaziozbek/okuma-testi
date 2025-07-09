@@ -58,11 +58,7 @@
 <body>
   <div class="container">
     <h2>Okuma Metni</h2>
-    <p id="readingText">
-      Bir sabah Gregor Samsa rahatsız edici rüyalarından uyandığında kendini yatağında dev bir böceğe dönüşmüş olarak buldu. 
-      Sert sırtının üzerinde yatıyor, başını biraz kaldırdığında kahverengi, kubbe şeklindeki karnını ve üzerinde zor bela duran 
-      çok sayıda bacağının kemiksi sertliğini görüyordu.
-    </p>
+    <p id="readingText">Yükleniyor...</p>
 
     <button class="btn" onclick="startReading()" id="startBtn">Okumaya Başla</button>
     <button class="btn" onclick="finishReading()" id="finishBtn" style="display:none;">Bitirdim</button>
@@ -70,10 +66,36 @@
     <div id="timer">Süre: 0 saniye</div>
   </div>
 
-  <script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+      authDomain: "okuma-testi.firebaseapp.com",
+      projectId: "okuma-testi",
+      storageBucket: "okuma-testi.firebasestorage.app",
+      messagingSenderId: "820936161658",
+      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
+      measurementId: "G-2WBL96ETV1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Metni Firestore'dan çek ve sayfaya yazdır
+    const docRef = doc(db, "ayarlar", "okumaMetni");
+    getDoc(docRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        document.getElementById("readingText").innerText = docSnap.data().metin;
+      } else {
+        document.getElementById("readingText").innerText = "Okuma metni bulunamadı.";
+      }
+    });
+
     let startTime, timerInterval;
 
-    function startReading() {
+    window.startReading = function() {
       startTime = Date.now();
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("finishBtn").style.display = "inline-block";
@@ -84,7 +106,7 @@
       }, 1000);
     }
 
-    function finishReading() {
+    window.finishReading = function() {
       clearInterval(timerInterval);
       const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
 
