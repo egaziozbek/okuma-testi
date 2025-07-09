@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
+      background: linear-gradient(to right, #1A237E, #FFA000);/
       margin: 0;
       padding: 0;
     }
@@ -92,24 +92,20 @@
   </div>
 
   <script>
-    // Öğrenci bilgilerini (örnek olarak statik giriyoruz, canlı sistemde dinamik olabilir)
     const ad = "Ali Yılmaz";
     const yas = 12;
     const tel = "05551234567";
 
-    // Sonuçlar (opsiyonel: dinamik olarak hesaplanabilir)
     const okumaSuresi = "2 dakika 30 saniye";
     const dogru = 8;
     const yanlis = 2;
     const yuzde = "%80";
 
-    // Sayfada tabloya verileri yerleştir (opsiyonel, zaten HTML'de var)
     document.getElementById("sureCell").textContent = okumaSuresi;
     document.getElementById("dogruCell").textContent = dogru;
     document.getElementById("yanlisCell").textContent = yanlis;
     document.getElementById("yuzdeCell").textContent = yuzde;
 
-    // Demo kayıt linkini oluştur
     const demoUrl = `demo-kayit.html?ad=${encodeURIComponent(ad)}&yas=${yas}&tel=${tel}`;
     document.getElementById("demoLink").href = demoUrl;
   </script>
