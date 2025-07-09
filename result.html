@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #1A237E, #FFA000);/
+      background: linear-gradient(to right, #1A237E, #FFA000);
       margin: 0;
       padding: 0;
     }
@@ -73,16 +73,16 @@
 
     <table>
       <tr>
-        <th>Okuma Süresi</th>
+        <th>Okuma Hızı (kelime/dk)</th>
         <th>Doğru Sayısı</th>
         <th>Yanlış Sayısı</th>
         <th>Başarı Yüzdesi</th>
       </tr>
       <tr>
-        <td id="sureCell">2 dakika 30 saniye</td>
-        <td id="dogruCell">8</td>
-        <td id="yanlisCell">2</td>
-        <td id="yuzdeCell">80%</td>
+        <td id="hizCell">-</td>
+        <td id="dogruCell">-</td>
+        <td id="yanlisCell">-</td>
+        <td id="yuzdeCell">-</td>
       </tr>
     </table>
 
@@ -92,16 +92,23 @@
   </div>
 
   <script>
-    const ad = "Ali Yılmaz";
-    const yas = 12;
-    const tel = "05551234567";
+    const params = new URLSearchParams(window.location.search);
 
-    const okumaSuresi = "2 dakika 30 saniye";
-    const dogru = 8;
-    const yanlis = 2;
-    const yuzde = "%80";
+    const ad = params.get("ad") || "Bilinmiyor";
+    const yas = params.get("yas") || "-";
+    const tel = params.get("tel") || "-";
+    const dogru = parseInt(params.get("dogru")) || 0;
+    const yanlis = parseInt(params.get("yanlis")) || 0;
+    const metin = params.get("metin") || "";
+    const sure = parseInt(params.get("sure")) || 60;
 
-    document.getElementById("sureCell").textContent = okumaSuresi;
+    const toplam = dogru + yanlis;
+    const yuzde = toplam > 0 ? Math.round((dogru / toplam) * 100) + "%" : "-";
+
+    const kelimeSayisi = metin.trim().split(/\s+/).length;
+    const okumaHizi = Math.round((kelimeSayisi * 60) / sure); // kelime/dk
+
+    document.getElementById("hizCell").textContent = okumaHizi + " kelime/dk";
     document.getElementById("dogruCell").textContent = dogru;
     document.getElementById("yanlisCell").textContent = yanlis;
     document.getElementById("yuzdeCell").textContent = yuzde;
