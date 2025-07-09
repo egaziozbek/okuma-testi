@@ -2,91 +2,100 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sonuç Ekranı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Okuma Sayfası</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #1A237E, #FFA000);
       margin: 0;
-      padding: 2rem;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #1A237E, #FFA000);
+      color: #333;
       display: flex;
+      flex-direction: column;
+      align-items: center;
       justify-content: center;
+      padding: 2rem;
     }
     .container {
-      background: #fff;
+      background-color: #fff;
+      border-radius: 1rem;
       padding: 2rem;
-      border-radius: 12px;
       max-width: 700px;
-      width: 100%;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
     }
     h2 {
-      text-align: center;
-      color: #1A237E;
+      color: #0D47A1;
+      margin-bottom: 1rem;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+    p#readingText {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      text-align: justify;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 12px;
-      text-align: center;
-    }
-    th {
-      background-color: #1A237E;
-      color: white;
-    }
-    .demo-button {
-      margin-top: 20px;
+    .btn {
       display: inline-block;
-      padding: 12px 24px;
-      background-color: #FFA000;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
+      background-color: #F57C00;
+      color: #fff;
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      margin-top: 1.5rem;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .btn:hover {
+      background-color: #ef6c00;
+    }
+    #timer {
       font-weight: bold;
-      text-align: center;
+      color: #0D47A1;
+      margin-top: 1rem;
+      font-size: 1.1rem;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Test Sonuçları</h2>
-    <table>
-      <tr>
-        <th>Okuma Hızı (kelime/dk)</th>
-        <th>Doğru Sayısı</th>
-        <th>Yanlış Sayısı</th>
-        <th>Başarı Yüzdesi</th>
-      </tr>
-      <tr>
-        <td id="okumaHiziCell">-</td>
-        <td id="dogruCell">0</td>
-        <td id="yanlisCell">0</td>
-        <td id="yuzdeCell">-</td>
-      </tr>
-    </table>
+    <h2>Okuma Metni</h2>
+    <p id="readingText">
+      Bir sabah Gregor Samsa rahatsız edici rüyalarından uyandığında kendini yatağında dev bir böceğe dönüşmüş olarak buldu. 
+      Sert sırtının üzerinde yatıyor, başını biraz kaldırdığında kahverengi, kubbe şeklindeki karnını ve üzerinde zor bela duran 
+      çok sayıda bacağının kemiksi sertliğini görüyordu.
+    </p>
 
-    <div style="text-align:center;">
-      <a href="demo-kayit.html" class="demo-button">Ücretsiz Online Demo Ders Kayıt</a>
-    </div>
+    <button class="btn" onclick="startReading()" id="startBtn">Okumaya Başla</button>
+    <button class="btn" onclick="finishReading()" id="finishBtn" style="display:none;">Bitirdim</button>
+
+    <div id="timer">Süre: 0 saniye</div>
   </div>
 
   <script>
-    const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
-    const sure = parseInt(localStorage.getItem("readingTime")) || 1;
+    let startTime, timerInterval;
 
-    const okumaHizi = Math.round((kelimeSayisi * 60) / sure);
+    function startReading() {
+      startTime = Date.now();
+      document.getElementById("startBtn").style.display = "none";
+      document.getElementById("finishBtn").style.display = "inline-block";
 
-    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
+      timerInterval = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        document.getElementById("timer").innerText = "Süre: " + elapsed + " saniye";
+      }, 1000);
+    }
 
-    // Diğer hücreler şimdilik sabit
-    document.getElementById("dogruCell").textContent = 0;
-    document.getElementById("yanlisCell").textContent = 0;
-    document.getElementById("yuzdeCell").textContent = "-";
+    function finishReading() {
+      clearInterval(timerInterval);
+      const totalSeconds = Math.floor((Date.now() - startTime) / 1000);
+
+      const text = document.getElementById("readingText").innerText.trim();
+      const wordCount = text.split(/\s+/).length;
+
+      localStorage.setItem("readingTime", totalSeconds);
+      localStorage.setItem("kelimeSayisi", wordCount);
+
+      window.location.href = "result.html";
+    }
   </script>
 </body>
 </html>
