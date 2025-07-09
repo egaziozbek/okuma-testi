@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Okuma Metni Düzenle</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+      color: #1A237E;
+    }
+    textarea {
+      width: 100%;
+      height: 300px;
+      padding: 15px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      resize: vertical;
+      margin-top: 20px;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      background-color: #1A237E;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #303f9f;
+    }
+    #message {
+      text-align: center;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Okuma Metni Düzenle</h2>
+  <textarea id="metinAlani" placeholder="Yükleniyor..."></textarea>
+  <button id="kaydetBtn">Metni Kaydet</button>
+  <p id="message"></p>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+      authDomain: "okuma-testi.firebaseapp.com",
+      projectId: "okuma-testi",
+      storageBucket: "okuma-testi.firebasestorage.app",
+      messagingSenderId: "820936161658",
+      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
+      measurementId: "G-2WBL96ETV1"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
+
+    const textarea = document.getElementById("metinAlani");
+    const message = document.getElementById("message");
+    const kaydetBtn = document.getElementById("kaydetBtn");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "admin-login.html";
+        return;
+      }
+
+      const token = await user.getIdTokenResult();
+      if (!token.claims.admin) {
+        message.textContent = "Yetkiniz yok.";
+        textarea.style.display = "none";
+        kaydetBtn.style.display = "none";
+        return;
+      }
+
+      const docRef = doc(db, "ayarlar", "okumaMetni");
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        textarea.value = docSnap.data().metin;
+      } else {
+        textarea.value = "";
+      }
+
+      kaydetBtn.addEventListener("click", async () => {
+        const yeniMetin = textarea.value.trim();
+        await setDoc(docRef, { metin: yeniMetin });
+        message.textContent = "Metin başarıyla güncellendi.";
+      });
+    });
+  </script>
+</body>
+</html>
