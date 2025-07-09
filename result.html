@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
@@ -79,7 +79,7 @@
         <th>Başarı Yüzdesi</th>
       </tr>
       <tr>
-        <td id="hizCell">-</td>
+        <td id="sureCell">-</td>
         <td id="dogruCell">-</td>
         <td id="yanlisCell">-</td>
         <td id="yuzdeCell">-</td>
@@ -93,26 +93,34 @@
 
   <script>
     const params = new URLSearchParams(window.location.search);
-
-    const ad = params.get("ad") || "Bilinmiyor";
-    const yas = params.get("yas") || "-";
-    const tel = params.get("tel") || "-";
+    const metin = params.get("metin") || "";
+    const sure = parseInt(params.get("sure")) || 1; // saniye
     const dogru = parseInt(params.get("dogru")) || 0;
     const yanlis = parseInt(params.get("yanlis")) || 0;
-    const metin = params.get("metin") || "";
-    const sure = parseInt(params.get("sure")) || 60;
+    const ad = params.get("ad") || "";
+    const yas = params.get("yas") || "";
+    const tel = params.get("tel") || "";
 
-    const toplam = dogru + yanlis;
-    const yuzde = toplam > 0 ? Math.round((dogru / toplam) * 100) + "%" : "-";
-
+    // Kelime sayısı hesapla
     const kelimeSayisi = metin.trim().split(/\s+/).length;
-    const okumaHizi = Math.round((kelimeSayisi * 60) / sure); // kelime/dk
 
-    document.getElementById("hizCell").textContent = okumaHizi + " kelime/dk";
+    // Dakikaya çevir
+    const dakika = sure / 60;
+
+    // Okuma hızı (kelime / dakika)
+    const okumaHizi = Math.round(kelimeSayisi / dakika);
+
+    // Başarı yüzdesi
+    const toplam = dogru + yanlis;
+    const yuzde = toplam > 0 ? Math.round((dogru / toplam) * 100) : "-";
+
+    // HTML'e yaz
+    document.getElementById("sureCell").textContent = `${okumaHizi} kelime/dk`;
     document.getElementById("dogruCell").textContent = dogru;
     document.getElementById("yanlisCell").textContent = yanlis;
-    document.getElementById("yuzdeCell").textContent = yuzde;
+    document.getElementById("yuzdeCell").textContent = yuzde === "-" ? "-" : `${yuzde}%`;
 
+    // Demo bağlantısı
     const demoUrl = `demo-kayit.html?ad=${encodeURIComponent(ad)}&yas=${yas}&tel=${tel}`;
     document.getElementById("demoLink").href = demoUrl;
   </script>
