@@ -84,13 +84,14 @@
     const db = getFirestore(app);
 
     async function fetchText() {
-      const docRef = doc(db, "ayarlar", "metin");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        document.getElementById("readingText").innerText = docSnap.data().metin;
-      } else {
-        document.getElementById("readingText").innerText = "Okuma metni bulunamadı.";
-      }
+      const docRef = doc(db, "ayarlar", "okumaMetni");
+const docSnap = await getDoc(docRef);
+if (docSnap.exists()) {
+  document.getElementById("readingText").innerText = docSnap.data().metin;
+} else {
+  document.getElementById("readingText").innerText = "Okuma metni bulunamadı.";
+}
+
     }
 
     fetchText();
