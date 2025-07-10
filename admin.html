@@ -132,10 +132,12 @@
           kayitTablosu.style.display = "table";
         } else {
           yetkisizYazi.style.display = "block";
+          setTimeout(() => window.location.href = "admin-login.html", 2000);
         }
       } catch (err) {
         yetkisizYazi.textContent = "Veriler alınamadı: " + err.message;
         yetkisizYazi.style.display = "block";
+        setTimeout(() => window.location.href = "admin-login.html", 3000);
       }
     });
   </script>
