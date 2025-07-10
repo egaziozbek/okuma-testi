@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Okuma Metni Düzenle</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f4f4;
       padding: 30px;
     }
     h2 {
@@ -19,18 +19,18 @@
       height: 300px;
       padding: 15px;
       font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      resize: vertical;
       margin-top: 20px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
       display: block;
       margin: 20px auto;
-      padding: 10px 20px;
       background-color: #1A237E;
       color: white;
       border: none;
+      padding: 12px 20px;
       border-radius: 6px;
       font-size: 16px;
       cursor: pointer;
@@ -38,18 +38,18 @@
     button:hover {
       background-color: #303f9f;
     }
-    #message {
+    #status {
       text-align: center;
-      margin-top: 10px;
       font-weight: bold;
+      color: green;
     }
   </style>
 </head>
 <body>
-  <h2>Okuma Metni Düzenle</h2>
-  <textarea id="metinAlani" placeholder="Yükleniyor..."></textarea>
-  <button id="kaydetBtn">Metni Kaydet</button>
-  <p id="message"></p>
+  <h2>Okuma Metnini Düzenle</h2>
+  <textarea id="metinText">Yükleniyor...</textarea>
+  <button id="saveBtn">Kaydet</button>
+  <p id="status"></p>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -70,9 +70,9 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const textarea = document.getElementById("metinAlani");
-    const message = document.getElementById("message");
-    const kaydetBtn = document.getElementById("kaydetBtn");
+    const textarea = document.getElementById("metinText");
+    const statusText = document.getElementById("status");
+    const saveBtn = document.getElementById("saveBtn");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -80,27 +80,36 @@
         return;
       }
 
-      const token = await user.getIdTokenResult();
-      if (!token.claims.admin) {
-        message.textContent = "Yetkiniz yok.";
-        textarea.style.display = "none";
-        kaydetBtn.style.display = "none";
+      const tokenResult = await user.getIdTokenResult();
+      if (!tokenResult.claims.admin) {
+        alert("Yetkisiz erişim.");
         return;
       }
 
-      const docRef = doc(db, "ayarlar", "okumaMetni");
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        textarea.value = docSnap.data().metin;
+      const ref = doc(db, "ayarlar", "okumaMetni");
+      const snapshot = await getDoc(ref);
+      if (snapshot.exists()) {
+        textarea.value = snapshot.data().metin;
       } else {
         textarea.value = "";
       }
 
-      kaydetBtn.addEventListener("click", async () => {
+      saveBtn.onclick = async () => {
         const yeniMetin = textarea.value.trim();
-        await setDoc(docRef, { metin: yeniMetin });
-        message.textContent = "Metin başarıyla güncellendi.";
-      });
+        if (!yeniMetin) {
+          alert("Metin boş olamaz.");
+          return;
+        }
+
+        try {
+          await setDoc(ref, { metin: yeniMetin });
+          statusText.textContent = "Metin başarıyla kaydedildi.";
+          statusText.style.color = "green";
+        } catch (err) {
+          statusText.textContent = "Hata oluştu: " + err.message;
+          statusText.style.color = "red";
+        }
+      };
     });
   </script>
 </body>
