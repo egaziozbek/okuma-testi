@@ -57,7 +57,7 @@
     <h2>Test Sonuçları</h2>
     <table>
       <tr>
-        <th>Okuma Hızı (kelime/dk)</th>
+        <th>Okuma Hızı</th>
         <th>Doğru Sayısı</th>
         <th>Yanlış Sayısı</th>
         <th>Başarı Yüzdesi</th>
@@ -81,7 +81,7 @@
 
     const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
-    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
+    document.getElementById("okumaHiziCell").textContent = `${okumaHizi}`;
 
     // Diğer hücreler şimdilik sabit kalsın
     document.getElementById("dogruCell").textContent = 0;
