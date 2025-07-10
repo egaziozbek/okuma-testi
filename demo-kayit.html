@@ -102,23 +102,36 @@
         return;
       }
 
-      const data = {
-        name,
-        age,
-        phone,
+      // Sonuç verisini al
+      const okumaSonucu = JSON.parse(localStorage.getItem("okumaSonucu"));
+
+      const kayitVerisi = {
+        adSoyad: name,
+        yas: age,
+        telefon: phone,
         kvkkOnayi: true,
         kayitTarihi: serverTimestamp()
       };
 
+      // Sonuç varsa ekle
+      if (okumaSonucu) {
+        kayitVerisi.okumaHizi = okumaSonucu.okumaHizi;
+        kayitVerisi.kelimeSayisi = okumaSonucu.kelimeSayisi;
+        kayitVerisi.sure = okumaSonucu.readingTime;
+        kayitVerisi.dogru = okumaSonucu.dogru;
+        kayitVerisi.yanlis = okumaSonucu.yanlis;
+        kayitVerisi.basariYuzdesi = okumaSonucu.yuzde;
+      }
+
       try {
-        await addDoc(collection(db, "demo_kayitlari"), data);
+        await addDoc(collection(db, "demo_kayitlari"), kayitVerisi);
         alert("Kayıt başarıyla gönderildi!");
+        localStorage.clear();
         document.getElementById("demoForm").reset();
       } catch (err) {
         alert("Hata oluştu: " + err.message);
       }
     });
-     
   </script>
 </body>
 </html>
