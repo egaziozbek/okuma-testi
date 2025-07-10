@@ -9,12 +9,13 @@
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
-      background: linear-gradient(to right, #1A237E, #FFA000);;
+      background: linear-gradient(to right, #1A237E, #FFA000);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      min-height: 100vh;
+      padding: 1rem;
     }
     .container {
       background-color: white;
@@ -69,8 +70,14 @@
       background-color: #ef6c00;
     }
     img.logo {
-      width: 160px;
+      width: 200px;
       margin-bottom: 1.2rem;
+    }
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      color: #fff;
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -82,10 +89,10 @@
 
     <form id="studentForm">
       <label for="name">Ad Soyad:</label>
-      <input type="text" id="name" name="name" required minlength="3">
+      <input type="text" id="name" name="name" required pattern="^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$" title="Sadece harf giriniz.">
 
       <label for="grade">Yaş</label>
-      <input type="text" id="grade" name="grade" required minlength="1">
+      <input type="number" id="grade" name="grade" required min="3" max="25" title="Lütfen geçerli bir yaş girin.">
 
       <button type="submit">Başla</button>
     </form>
@@ -97,7 +104,16 @@
   <script>
     document.getElementById('studentForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      localStorage.setItem('studentName', document.getElementById('name').value);
+      const nameInput = document.getElementById('name');
+      const nameRegex = /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+
+      if (!nameRegex.test(nameInput.value)) {
+        alert('Lütfen sadece harf giriniz.');
+        nameInput.focus();
+        return;
+      }
+
+      localStorage.setItem('studentName', nameInput.value);
       localStorage.setItem('studentGrade', document.getElementById('grade').value);
       window.location.href = 'reading.html';
     });
