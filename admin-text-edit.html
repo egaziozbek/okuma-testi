@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Okuma Metni Düzenle</title>
+  <title>Okuma Metni ve Soruları Düzenle</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -16,7 +16,7 @@
     }
     textarea {
       width: 100%;
-      height: 300px;
+      height: 200px;
       padding: 15px;
       font-size: 16px;
       margin-top: 20px;
@@ -43,12 +43,26 @@
       font-weight: bold;
       color: green;
     }
+    .section {
+      margin-bottom: 40px;
+    }
   </style>
 </head>
 <body>
-  <h2>Okuma Metnini Düzenle</h2>
-  <textarea id="metinText">Yükleniyor...</textarea>
-  <button id="saveBtn">Kaydet</button>
+  <h2>Okuma Metni ve Soruları Düzenle</h2>
+
+  <div class="section">
+    <h3>Okuma Metni</h3>
+    <textarea id="metinText">Yükleniyor...</textarea>
+    <button id="saveMetinBtn">Metni Kaydet</button>
+  </div>
+
+  <div class="section">
+    <h3>Sorular (Her satır bir soru olarak kaydedilir)</h3>
+    <textarea id="questionsText">Yükleniyor...</textarea>
+    <button id="saveQuestionsBtn">Soruları Kaydet</button>
+  </div>
+
   <p id="status"></p>
 
   <script type="module">
@@ -70,9 +84,11 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    const textarea = document.getElementById("metinText");
+    const metinText = document.getElementById("metinText");
+    const questionsText = document.getElementById("questionsText");
     const statusText = document.getElementById("status");
-    const saveBtn = document.getElementById("saveBtn");
+    const saveMetinBtn = document.getElementById("saveMetinBtn");
+    const saveQuestionsBtn = document.getElementById("saveQuestionsBtn");
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
@@ -86,27 +102,47 @@
         return;
       }
 
-      const ref = doc(db, "ayarlar", "okumaMetni");
-      const snapshot = await getDoc(ref);
-      if (snapshot.exists()) {
-        textarea.value = snapshot.data().metin;
+      const metinRef = doc(db, "ayarlar", "okumaMetni");
+      const soruRef = doc(db, "ayarlar", "sorular");
+
+      const metinSnap = await getDoc(metinRef);
+      if (metinSnap.exists()) {
+        metinText.value = metinSnap.data().metin;
       } else {
-        textarea.value = "";
+        metinText.value = "";
       }
 
-      saveBtn.onclick = async () => {
-        const yeniMetin = textarea.value.trim();
+      const soruSnap = await getDoc(soruRef);
+      if (soruSnap.exists()) {
+        questionsText.value = soruSnap.data().liste.join("\n");
+      } else {
+        questionsText.value = "";
+      }
+
+      saveMetinBtn.onclick = async () => {
+        const yeniMetin = metinText.value.trim();
         if (!yeniMetin) {
           alert("Metin boş olamaz.");
           return;
         }
-
         try {
-          await setDoc(ref, { metin: yeniMetin });
+          await setDoc(metinRef, { metin: yeniMetin });
           statusText.textContent = "Metin başarıyla kaydedildi.";
           statusText.style.color = "green";
         } catch (err) {
-          statusText.textContent = "Hata oluştu: " + err.message;
+          statusText.textContent = "Hata: " + err.message;
+          statusText.style.color = "red";
+        }
+      };
+
+      saveQuestionsBtn.onclick = async () => {
+        const sorular = questionsText.value.trim().split("\n").filter(s => s);
+        try {
+          await setDoc(soruRef, { liste: sorular });
+          statusText.textContent = "Sorular başarıyla kaydedildi.";
+          statusText.style.color = "green";
+        } catch (err) {
+          statusText.textContent = "Hata: " + err.message;
           statusText.style.color = "red";
         }
       };
