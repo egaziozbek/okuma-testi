@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
@@ -9,108 +9,84 @@
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #1A237E, #FFA000);
       margin: 0;
-      padding: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
     }
-
     .container {
-      max-width: 800px;
-      margin: 50px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
-
     h2 {
       text-align: center;
       color: #1A237E;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 30px 0;
+      margin-top: 20px;
     }
-
     th, td {
       border: 1px solid #ddd;
-      padding: 15px;
+      padding: 12px;
       text-align: center;
     }
-
     th {
       background-color: #1A237E;
       color: white;
     }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    .button-container {
-      text-align: center;
-      margin-top: 30px;
-    }
-
     .demo-button {
+      margin-top: 20px;
+      display: inline-block;
       padding: 12px 24px;
       background-color: #FFA000;
       color: white;
       text-decoration: none;
       border-radius: 8px;
       font-weight: bold;
-      transition: 0.3s;
-    }
-
-    .demo-button:hover {
-      background-color: #fb8c00;
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Test Sonuçları</h2>
-
     <table>
       <tr>
-        <th>Okuma Hızı </th>
+        <th>Okuma Hızı (kelime/dk)</th>
         <th>Doğru Sayısı</th>
         <th>Yanlış Sayısı</th>
         <th>Başarı Yüzdesi</th>
       </tr>
       <tr>
-        <td id="sureCell">-</td>
-        <td id="dogruCell">-</td>
-        <td id="yanlisCell">-</td>
+        <td id="okumaHiziCell">-</td>
+        <td id="dogruCell">0</td>
+        <td id="yanlisCell">0</td>
         <td id="yuzdeCell">-</td>
       </tr>
     </table>
 
-    <div class="button-container">
-       <p class="description">Pelikan Eğitim Kurumlarında Hızlı Okuma ve Okuduğunu Anlama Eğitimi alarak, okuma hızınızı dakikada 350 kelimeye çıkarabilirsiniz. Bunu yaparken gerçekleştirdiğimiz okuma anlama teknikleriyle birlikte, algı düzeyinizi ve odaklanma becerinizi de geliştirip okuduğunu anlama oranınızı en üst seviyeye çıkarabilirsiniz. 
-
-ZİHNİNİ HIZLANDIR. ZAMAN RAKİBİN OLMASIN"</p>
-      <a id="demoLink" class="demo-button">Ücretsiz Online Demo Ders Kayıt</a>
+    <div style="text-align:center;">
+      <a href="demo-kayit.html" class="demo-button">Ücretsiz Online Demo Ders Kayıt</a>
     </div>
   </div>
 
   <script>
-  const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
-  const readingTime = parseInt(localStorage.getItem("readingTime")) || 1; // saniye
+    const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
+    const readingTime = parseInt(localStorage.getItem("readingTime")) || 1;
 
-  const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
+    const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
-  const dogru = 0; // şimdilik örnek
-  const yanlis = 0;
-  const yuzde = "-";
+    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
 
-  document.getElementById("sureCell").textContent = `${okumaHizi} `;
-  document.getElementById("dogruCell").textContent = dogru;
-  document.getElementById("yanlisCell").textContent = yanlis;
-  document.getElementById("yuzdeCell").textContent = yuzde;
-
-  // Demo yönlendirme (dilersen sabit tutabilirsin)
-  document.getElementById("demoLink").href = "demo-kayit.html";
-</script>
+    // Diğer hücreler şimdilik sabit kalsın
+    document.getElementById("dogruCell").textContent = 0;
+    document.getElementById("yanlisCell").textContent = 0;
+    document.getElementById("yuzdeCell").textContent = "-";
+  </script>
 </body>
 </html>
