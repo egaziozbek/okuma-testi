@@ -1,126 +1,93 @@
-<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Okuma Soruları</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #1A237E, #FFA000);
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 700px;
-      width: 100%;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
-      color: #1A237E;
-    }
-    .question {
-      margin-bottom: 20px;
-    }
-    .option {
-      margin: 4px 0;
-    }
-    .btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 12px 24px;
-      background-color: #FFA000;
-      color: white;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-      cursor: pointer;
-      border: none;
-      width: 100%;
-    }
-  </style>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+<!-- ... önceki head kısmı aynı kalır ... -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-      authDomain: "okuma-testi.firebaseapp.com",
-      projectId: "okuma-testi",
-      storageBucket: "okuma-testi.firebasestorage.app",
-      messagingSenderId: "820936161658",
-      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-      measurementId: "G-2WBL96ETV1"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
+    authDomain: "okuma-testi.firebaseapp.com",
+    projectId: "okuma-testi",
+    storageBucket: "okuma-testi.firebasestorage.app",
+    messagingSenderId: "820936161658",
+    appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
+    measurementId: "G-2WBL96ETV1"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    let dogruCevaplar = [];
+  let dogruCevaplar = [];
 
-    async function sorulariYukle() {
-      const docRef = doc(db, "questions", "0p5ZCRA6tUvLUvIEWlNg");
-      const docSnap = await getDoc(docRef);
+  async function sorulariYukle() {
+    const docRef = doc(db, "questions", "0p5ZCRA6tUvLUvIEWlNg");
+    const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists()) {
-        const veri = docSnap.data();
-        const sorular = veri.sorular;
+    if (docSnap.exists()) {
+      const veri = docSnap.data();
+      const sorular = veri.sorular;
 
-        let formHTML = "";
+      let formHTML = "";
 
-        sorular.forEach((soruObj, index) => {
-          dogruCevaplar.push(soruObj.cevap);
+      sorular.forEach((soruObj, index) => {
+        dogruCevaplar.push(soruObj.cevap);
 
-          formHTML += `<div class="question">
-            <p><strong>${index + 1}. ${soruObj.soru}</strong></p>`;
-          soruObj.secenekler.forEach((secenek, i) => {
-            formHTML += `<div class="option"><label><input type="radio" name="soru${index}" value="${secenek}"> ${secenek}</label></div>`;
-          });
-          formHTML += `</div>`;
+        formHTML += `<div class="question">
+          <p><strong>${index + 1}. ${soruObj.soru}</strong></p>`;
+
+        // Boş bırak seçeneği (ilk sırada)
+        formHTML += `<div class="option">
+          <label><input type="radio" name="soru${index}" value=""> Boş bırak</label>
+        </div>`;
+
+        soruObj.secenekler.forEach(secenek => {
+          formHTML += `<div class="option">
+            <label><input type="radio" name="soru${index}" value="${secenek}"> ${secenek}</label>
+          </div>`;
         });
 
-        document.getElementById("soruForm").innerHTML = formHTML;
-      } else {
-        document.getElementById("soruForm").innerHTML = "<p>Sorular yüklenemedi.</p>";
-      }
+        formHTML += `</div>`;
+      });
+
+      document.getElementById("soruForm").innerHTML = formHTML;
+    } else {
+      document.getElementById("soruForm").innerHTML = "<p>Sorular yüklenemedi.</p>";
     }
+  }
 
-    window.kontrolEt = function () {
-      let dogru = 0;
-      let yanlis = 0;
+  window.kontrolEt = function () {
+    const toplamSoru = dogruCevaplar.length;
+    let dogru = 0;
+    let yanlis = 0;
+    let eksikVar = false;
 
-      dogruCevaplar.forEach((cevap, i) => {
-        const secilen = document.querySelector(`input[name='soru${i}']:checked`);
-        const deger = secilen ? secilen.value : "";
-        if (deger === cevap) {
+    dogruCevaplar.forEach((cevap, i) => {
+      const secilen = document.querySelector(`input[name='soru${i}']:checked`);
+      if (!secilen) {
+        eksikVar = true;
+      } else {
+        const deger = secilen.value;
+        if (deger === "") {
+          // boş bırak seçilmişse sayma
+          return;
+        } else if (deger === cevap) {
           dogru++;
         } else {
           yanlis++;
         }
-      });
+      }
+    });
 
-      localStorage.setItem("dogruSayisi", dogru);
-      localStorage.setItem("yanlisSayisi", yanlis);
-      localStorage.setItem("basariYuzdesi", ((dogru / dogruCevaplar.length) * 100).toFixed(1));
-
-      window.location.href = "result.html";
+    if (eksikVar) {
+      alert("Lütfen tüm sorulara cevap veriniz. Her soru için 'Boş bırak' seçeneği de vardır.");
+      return;
     }
 
-    sorulariYukle();
-  </script>
-</head>
-<body>
-  <div class="container">
-    <h2>Okuma Soruları</h2>
-    <form id="soruForm"></form>
-    <button class="btn" onclick="kontrolEt()">Cevapları Kontrol Et</button>
-  </div>
-</body>
-</html>
+    localStorage.setItem("dogruSayisi", dogru);
+    localStorage.setItem("yanlisSayisi", yanlis);
+    localStorage.setItem("basariYuzdesi", ((dogru / toplamSoru) * 100).toFixed(1));
+
+    window.location.href = "result.html";
+  }
+
+  sorulariYukle();
+</script>
