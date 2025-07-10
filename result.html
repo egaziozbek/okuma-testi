@@ -85,7 +85,7 @@
     const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100) : "-";
     const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
-    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
+    document.getElementById("okumaHiziCell").textContent = `${okumaHizi}`;
     document.getElementById("dogruCell").textContent = dogru;
     document.getElementById("yanlisCell").textContent = yanlis;
     document.getElementById("yuzdeCell").textContent = yuzde !== "-" ? `%${yuzde}` : "-";
