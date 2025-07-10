@@ -1,54 +1,76 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Okuma Soruları</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Kayıt Formu</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #1A237E, #FFA000);
       margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
+      padding: 0;
     }
     .container {
-      background: #fff;
-      padding: 2rem;
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: #fff;
+      padding: 30px;
       border-radius: 12px;
-      max-width: 700px;
-      width: 100%;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
     h2 {
       text-align: center;
       color: #1A237E;
     }
-    .question {
-      margin-bottom: 20px;
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
     }
-    .option {
-      margin: 4px 0;
+    input, button {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
     }
-    .btn {
-      margin-top: 20px;
-      display: inline-block;
-      padding: 12px 24px;
+    button {
       background-color: #FFA000;
       color: white;
-      text-decoration: none;
-      border-radius: 8px;
       font-weight: bold;
-      text-align: center;
       cursor: pointer;
-      border: none;
-      width: 100%;
+    }
+    button:hover {
+      background-color: #fb8c00;
+    }
+    label.kvkk-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 14px;
     }
   </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Demo Ders Kaydı</h2>
+    <form id="demoForm">
+      <input type="text" id="name" placeholder="Ad Soyad" required />
+      <input type="number" id="age" placeholder="Yaş" required />
+      <input type="tel" id="phone" placeholder="Telefon" required />
+
+      <label class="kvkk-label">
+        <input type="checkbox" id="kvkk" required />
+        <span>Kişisel verilerimin <strong>KVKK kapsamında işlenmesini</strong> kabul ediyorum.</span>
+      </label>
+
+      <button type="submit">Kaydı Gönder</button>
+    </form>
+  </div>
+
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
@@ -63,64 +85,34 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    let dogruCevaplar = [];
+    document.getElementById("demoForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    async function sorulariYukle() {
-      const docRef = doc(db, "questions", "0p5ZCRA6tUvLUvIEWlNg");
-      const docSnap = await getDoc(docRef);
+      const name = document.getElementById("name").value.trim();
+      const age = document.getElementById("age").value;
+      const phone = document.getElementById("phone").value.trim();
+      const kvkkChecked = document.getElementById("kvkk").checked;
 
-      if (docSnap.exists()) {
-        const veri = docSnap.data();
-        const sorular = veri.sorular;
-
-        let formHTML = "";
-
-        sorular.forEach((soruObj, index) => {
-          dogruCevaplar.push(soruObj.cevap);
-
-          formHTML += `<div class="question">
-            <p><strong>${index + 1}. ${soruObj.soru}</strong></p>`;
-          soruObj.secenekler.forEach((secenek, i) => {
-            formHTML += `<div class="option"><label><input type="radio" name="soru${index}" value="${secenek}"> ${secenek}</label></div>`;
-          });
-          formHTML += `</div>`;
-        });
-
-        document.getElementById("soruForm").innerHTML = formHTML;
-      } else {
-        document.getElementById("soruForm").innerHTML = "<p>Sorular yüklenemedi.</p>";
+      if (!kvkkChecked) {
+        alert("KVKK onayını kabul etmelisiniz.");
+        return;
       }
-    }
 
-    window.kontrolEt = function () {
-      let dogru = 0;
-      let yanlis = 0;
+      const data = {
+        name,
+        age,
+        phone,
+        kayitTarihi: new Date().toISOString()
+      };
 
-      dogruCevaplar.forEach((cevap, i) => {
-        const secilen = document.querySelector(`input[name='soru${i}']:checked`);
-        const deger = secilen ? secilen.value : "";
-        if (deger === cevap) {
-          dogru++;
-        } else {
-          yanlis++;
-        }
-      });
-
-      localStorage.setItem("dogruSayisi", dogru);
-      localStorage.setItem("yanlisSayisi", yanlis);
-      localStorage.setItem("basariYuzdesi", ((dogru / dogruCevaplar.length) * 100).toFixed(1));
-
-      window.location.href = "result.html";
-    }
-
-    sorulariYukle();
+      try {
+        await addDoc(collection(db, "demo_kayitlari"), data);
+        alert("Kayıt başarıyla gönderildi!");
+        document.getElementById("demoForm").reset();
+      } catch (err) {
+        alert("Hata oluştu: " + err.message);
+      }
+    });
   </script>
-</head>
-<body>
-  <div class="container">
-    <h2>Okuma Soruları</h2>
-    <form id="soruForm"></form>
-    <button class="btn" onclick="kontrolEt()">Cevapları Kontrol Et</button>
-  </div>
 </body>
 </html>
