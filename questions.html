@@ -28,9 +28,8 @@
     .question {
       margin-bottom: 20px;
     }
-    label {
-      display: block;
-      margin-top: 10px;
+    .option {
+      margin: 4px 0;
     }
     .btn {
       margin-top: 20px;
@@ -44,6 +43,7 @@
       text-align: center;
       cursor: pointer;
       border: none;
+      width: 100%;
     }
   </style>
 </head>
@@ -77,20 +77,22 @@
       const querySnapshot = await getDocs(collection(db, "questions"));
       let formHTML = "";
       let index = 0;
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const sorular = data.liste;
         dogruCevaplar = data.cevaplar;
-        sorular.forEach((soru, i) => {
-          formHTML += `
-            <div class="question">
-              <label for="soru${index}">${soru}</label>
-              <input type="text" id="soru${index}" />
-            </div>
-          `;
-          index++;
-        });
+
+        for (let i = 0; i < sorular.length; i++) {
+          formHTML += `<div class="question">
+            <p><strong>${i + 1}. ${sorular[i]}</strong></p>
+            <div class="option"><label><input type="radio" name="soru${i}" value="A"> A</label></div>
+            <div class="option"><label><input type="radio" name="soru${i}" value="B"> B</label></div>
+            <div class="option"><label><input type="radio" name="soru${i}" value="C"> C</label></div>
+          </div>`;
+        }
       });
+
       document.getElementById("soruForm").innerHTML = formHTML;
     }
 
@@ -101,8 +103,9 @@
       let yanlis = 0;
 
       dogruCevaplar.forEach((cevap, i) => {
-        const girilen = document.getElementById("soru" + i).value.trim().toLowerCase();
-        if (girilen === cevap.toLowerCase()) {
+        const secilen = document.querySelector(`input[name='soru${i}']:checked`);
+        const deger = secilen ? secilen.value : "";
+        if (deger.toLowerCase() === cevap.toLowerCase()) {
           dogru++;
         } else {
           yanlis++;
