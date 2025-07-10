@@ -43,11 +43,12 @@
     button:hover {
       background-color: #fb8c00;
     }
-    label.kvkk-label {
+    .kvkk-label {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 10px;
       font-size: 14px;
+      line-height: 1.4;
     }
   </style>
 </head>
@@ -61,7 +62,10 @@
 
       <label class="kvkk-label">
         <input type="checkbox" id="kvkk" required />
-        <span>Kişisel verilerimin <strong>KVKK kapsamında işlenmesini</strong> kabul ediyorum.</span>
+        <span>
+          Kişisel verilerimin <strong>6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK)</strong>
+          kapsamında işlenmesine onay veriyorum.
+        </span>
       </label>
 
       <button type="submit">Kaydı Gönder</button>
@@ -70,7 +74,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
@@ -89,12 +93,12 @@
       e.preventDefault();
 
       const name = document.getElementById("name").value.trim();
-      const age = document.getElementById("age").value;
+      const age = document.getElementById("age").value.trim();
       const phone = document.getElementById("phone").value.trim();
       const kvkkChecked = document.getElementById("kvkk").checked;
 
       if (!kvkkChecked) {
-        alert("KVKK onayını kabul etmelisiniz.");
+        alert("Lütfen KVKK onay kutusunu işaretleyin.");
         return;
       }
 
@@ -102,7 +106,8 @@
         name,
         age,
         phone,
-        kayitTarihi: new Date().toISOString()
+        kvkkOnayi: true,
+        kayitTarihi: serverTimestamp()
       };
 
       try {
