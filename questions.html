@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Okuma Soruları</title>
   <style>
@@ -46,26 +46,17 @@
       width: 100%;
     }
   </style>
-</head>
-<body>
-  <div class="container">
-    <h2>Okuma Soruları</h2>
-    <form id="soruForm"></form>
-    <button class="btn" onclick="kontrolEt()">Cevapları Kontrol Et</button>
-  </div>
-
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-      authDomain: "okuma-testi.firebaseapp.com",
-      projectId: "okuma-testi",
-      storageBucket: "okuma-testi.appspot.com",
-      messagingSenderId: "820936161658",
-      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-      measurementId: "G-2WBL96ETV1"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -74,29 +65,31 @@
     let dogruCevaplar = [];
 
     async function sorulariYukle() {
-      const querySnapshot = await getDocs(collection(db, "questions"));
-      let formHTML = "";
-      let index = 0;
+      const docRef = doc(db, "questions", "df15vWW0whNrsYrVy0jd");
+      const docSnap = await getDoc(docRef);
 
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const sorular = data.liste;
-        dogruCevaplar = data.cevaplar;
+      if (docSnap.exists()) {
+        const veri = docSnap.data();
+        const sorular = veri.sorular;
 
-        for (let i = 0; i < sorular.length; i++) {
+        let formHTML = "";
+
+        sorular.forEach((soruObj, index) => {
+          dogruCevaplar.push(soruObj.cevap);
+
           formHTML += `<div class="question">
-            <p><strong>${i + 1}. ${sorular[i]}</strong></p>
-            <div class="option"><label><input type="radio" name="soru${i}" value="A"> A</label></div>
-            <div class="option"><label><input type="radio" name="soru${i}" value="B"> B</label></div>
-            <div class="option"><label><input type="radio" name="soru${i}" value="C"> C</label></div>
-          </div>`;
-        }
-      });
+            <p><strong>${index + 1}. ${soruObj.soru}</strong></p>`;
+          soruObj.secenekler.forEach(secenek => {
+            formHTML += `<div class="option"><label><input type="radio" name="soru${index}" value="${secenek}"> ${secenek}</label></div>`;
+          });
+          formHTML += `</div>`;
+        });
 
-      document.getElementById("soruForm").innerHTML = formHTML;
+        document.getElementById("soruForm").innerHTML = formHTML;
+      } else {
+        document.getElementById("soruForm").innerHTML = "<p>Sorular yüklenemedi.</p>";
+      }
     }
-
-    sorulariYukle();
 
     window.kontrolEt = function () {
       let dogru = 0;
@@ -105,7 +98,7 @@
       dogruCevaplar.forEach((cevap, i) => {
         const secilen = document.querySelector(`input[name='soru${i}']:checked`);
         const deger = secilen ? secilen.value : "";
-        if (deger.toLowerCase() === cevap.toLowerCase()) {
+        if (deger === cevap) {
           dogru++;
         } else {
           yanlis++;
@@ -118,6 +111,15 @@
 
       window.location.href = "result.html";
     }
+
+    sorulariYukle();
   </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Okuma Soruları</h2>
+    <form id="soruForm"></form>
+    <button class="btn" onclick="kontrolEt()">Cevapları Kontrol Et</button>
+  </div>
 </body>
 </html>
