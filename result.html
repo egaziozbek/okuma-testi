@@ -78,15 +78,17 @@
   <script>
     const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
     const readingTime = parseInt(localStorage.getItem("readingTime")) || 1;
+    const dogru = parseInt(localStorage.getItem("dogruSayisi")) || 0;
+    const yanlis = parseInt(localStorage.getItem("yanlisSayisi")) || 0;
 
+    const toplamSoru = dogru + yanlis;
+    const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100) : "-";
     const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
-    document.getElementById("okumaHiziCell").textContent = `${okumaHizi}`;
-
-    // Diğer hücreler şimdilik sabit kalsın
-    document.getElementById("dogruCell").textContent = 0;
-    document.getElementById("yanlisCell").textContent = 0;
-    document.getElementById("yuzdeCell").textContent = "-";
+    document.getElementById("okumaHiziCell").textContent = `${okumaHizi} kelime/dk`;
+    document.getElementById("dogruCell").textContent = dogru;
+    document.getElementById("yanlisCell").textContent = yanlis;
+    document.getElementById("yuzdeCell").textContent = yuzde !== "-" ? `%${yuzde}` : "-";
   </script>
 </body>
 </html>
