@@ -84,7 +84,7 @@
     const db = getFirestore(app);
 
     async function fetchText() {
-      const docRef = doc(db, "okumaMetni", "metin");
+      const docRef = doc(db, "ayarlar", "metin");
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         document.getElementById("readingText").innerText = docSnap.data().metin;
