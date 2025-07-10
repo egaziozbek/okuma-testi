@@ -1,14 +1,25 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Okuma Metni ve Soruları Düzenle</title>
+  <title>Admin Panel - Okuma Soruları</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f4f4f4;
-      padding: 30px;
+      background: linear-gradient(to right, #1A237E, #FFA000);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 800px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
     h2 {
       text-align: center;
@@ -16,59 +27,46 @@
     }
     textarea {
       width: 100%;
-      height: 200px;
-      padding: 15px;
-      font-size: 16px;
-      margin-top: 20px;
-      border-radius: 8px;
+      height: 300px;
+      padding: 1rem;
       border: 1px solid #ccc;
-      box-sizing: border-box;
+      border-radius: 8px;
+      font-size: 14px;
+      resize: vertical;
     }
     button {
-      display: block;
-      margin: 20px auto;
-      background-color: #1A237E;
+      margin-top: 1rem;
+      padding: 12px 24px;
+      background-color: #FFA000;
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
-      font-size: 16px;
+      border-radius: 8px;
+      font-weight: bold;
       cursor: pointer;
     }
     button:hover {
-      background-color: #303f9f;
+      background-color: #fb8c00;
     }
     #status {
       text-align: center;
       font-weight: bold;
-      color: green;
-    }
-    .section {
-      margin-bottom: 40px;
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h2>Okuma Metni ve Soruları Düzenle</h2>
+  <div class="container">
+    <h2>Okuma Soruları (Admin)</h2>
 
-  <div class="section">
-    <h3>Okuma Metni</h3>
-    <textarea id="metinText">Yükleniyor...</textarea>
-    <button id="saveMetinBtn">Metni Kaydet</button>
+    <textarea id="questionsInput" placeholder="{\n  \"sorular\": [\n    {\n      \"soru\": \"...\",\n      \"secenekler\": [\"...\", \"...\"],\n      \"cevap\": \"...\"\n    }\n  ]\n}"></textarea>
+
+    <button onclick="sorulariKaydet()">Soruları Kaydet</button>
+    <p id="status"></p>
   </div>
-
-  <div class="section">
-    <h3>Sorular (Her satır bir soru olarak kaydedilir)</h3>
-    <textarea id="questionsText">Yükleniyor...</textarea>
-    <button id="saveQuestionsBtn">Soruları Kaydet</button>
-  </div>
-
-  <p id="status"></p>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js';
+    import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
@@ -82,71 +80,20 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const auth = getAuth(app);
 
-    const metinText = document.getElementById("metinText");
-    const questionsText = document.getElementById("questionsText");
-    const statusText = document.getElementById("status");
-    const saveMetinBtn = document.getElementById("saveMetinBtn");
-    const saveQuestionsBtn = document.getElementById("saveQuestionsBtn");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "admin-login.html";
-        return;
+    window.sorulariKaydet = async function () {
+      const status = document.getElementById("status");
+      try {
+        const input = document.getElementById("questionsInput").value;
+        const veri = JSON.parse(input);
+        await setDoc(doc(db, "questions", "0p5ZCRA6tUvLUvIEWlNg"), veri);
+        status.textContent = "Sorular başarıyla kaydedildi.";
+        status.style.color = "green";
+      } catch (e) {
+        status.textContent = "Hata: " + e.message;
+        status.style.color = "red";
       }
-
-      const tokenResult = await user.getIdTokenResult();
-      if (!tokenResult.claims.admin) {
-        alert("Yetkisiz erişim.");
-        return;
-      }
-
-      const metinRef = doc(db, "ayarlar", "okumaMetni");
-      const soruRef = doc(db, "ayarlar", "sorular");
-
-      const metinSnap = await getDoc(metinRef);
-      if (metinSnap.exists()) {
-        metinText.value = metinSnap.data().metin;
-      } else {
-        metinText.value = "";
-      }
-
-      const soruSnap = await getDoc(soruRef);
-      if (soruSnap.exists()) {
-        questionsText.value = soruSnap.data().liste.join("\n");
-      } else {
-        questionsText.value = "";
-      }
-
-      saveMetinBtn.onclick = async () => {
-        const yeniMetin = metinText.value.trim();
-        if (!yeniMetin) {
-          alert("Metin boş olamaz.");
-          return;
-        }
-        try {
-          await setDoc(metinRef, { metin: yeniMetin });
-          statusText.textContent = "Metin başarıyla kaydedildi.";
-          statusText.style.color = "green";
-        } catch (err) {
-          statusText.textContent = "Hata: " + err.message;
-          statusText.style.color = "red";
-        }
-      };
-
-      saveQuestionsBtn.onclick = async () => {
-        const sorular = questionsText.value.trim().split("\n").filter(s => s);
-        try {
-          await setDoc(soruRef, { liste: sorular });
-          statusText.textContent = "Sorular başarıyla kaydedildi.";
-          statusText.style.color = "green";
-        } catch (err) {
-          statusText.textContent = "Hata: " + err.message;
-          statusText.style.color = "red";
-        }
-      };
-    });
+    }
   </script>
 </body>
 </html>
