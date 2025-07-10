@@ -85,10 +85,17 @@
     const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100) : "-";
     const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
+    // Ekrana yaz
     document.getElementById("okumaHiziCell").textContent = `Dakikada ${okumaHizi} kelime`;
     document.getElementById("dogruCell").textContent = dogru;
     document.getElementById("yanlisCell").textContent = yanlis;
     document.getElementById("yuzdeCell").textContent = yuzde !== "-" ? `%${yuzde}` : "-";
+
+    // Sadece okuma hızı ve başarı yüzdesini sakla
+    localStorage.setItem("okumaSonucu", JSON.stringify({
+      okumaHizi,
+      yuzde
+    }));
   </script>
 </body>
 </html>
