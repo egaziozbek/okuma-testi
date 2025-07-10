@@ -67,6 +67,8 @@
         <th>Ad Soyad</th>
         <th>Yaş</th>
         <th>Telefon</th>
+        <th>Okuma Hızı</th>
+        <th>Başarı Yüzdesi</th>
         <th>Kayıt Tarihi</th>
       </tr>
     </thead>
@@ -76,7 +78,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
@@ -104,19 +106,29 @@
 
       try {
         const tokenResult = await user.getIdTokenResult();
+
         if (tokenResult.claims.admin === true) {
-          const snapshot = await getDocs(collection(db, "demo_kayitlari"));
+          const q = query(collection(db, "demo_kayitlari"), orderBy("kayitTarihi", "desc"));
+          const snapshot = await getDocs(q);
+
           snapshot.forEach((doc) => {
             const data = doc.data();
+            const tarih = data.kayitTarihi?.toDate ? data.kayitTarihi.toDate().toLocaleString("tr-TR") : "Bilinmiyor";
+            const hiz = data.okumaHizi ? `Dakikada ${data.okumaHizi} kelime` : "-";
+            const yuzde = data.basariYuzdesi !== undefined ? `%${data.basariYuzdesi}` : "-";
+
             const tr = document.createElement("tr");
             tr.innerHTML = `
-              <td>${data.name || "-"}</td>
-              <td>${data.age || "-"}</td>
-              <td>${data.phone || "-"}</td>
-              <td>${data.kayitTarihi ? new Date(data.kayitTarihi).toLocaleString() : "-"}</td>
+              <td>${data.adSoyad || data.name || "-"}</td>
+              <td>${data.yas || data.age || "-"}</td>
+              <td>${data.telefon || data.phone || "-"}</td>
+              <td>${hiz}</td>
+              <td>${yuzde}</td>
+              <td>${tarih}</td>
             `;
             veriBody.appendChild(tr);
           });
+
           kayitTablosu.style.display = "table";
         } else {
           yetkisizYazi.style.display = "block";
