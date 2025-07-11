@@ -119,14 +119,15 @@
         kayitVerisi.basariYuzdesi = okumaSonucu.yuzde;
       }
 
-try {
-  await addDoc(collection(db, "demo_kayitlari"), kayitVerisi);
-  alert("Kayıt başarıyla gönderildi!");
-  localStorage.clear();
-  document.getElementById("demoForm").reset();
-  window.location.href = "https://www.pelikanegitim.com";
-} catch (err) {
-  alert("Hata oluştu: " + err.message);
+      try {
+        await addDoc(collection(db, "demo_kayitlari"), kayitVerisi);
+        alert("Kayıt başarıyla gönderildi!");
+        localStorage.clear();
+        document.getElementById("demoForm").reset();
+        window.location.href = "https://www.pelikanegitim.com";
+} 
+      catch (err) {
+        alert("Hata oluştu: " + err.message);
 }
 
     });
