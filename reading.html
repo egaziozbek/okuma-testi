@@ -5,7 +5,7 @@
   <title>Pelikan Eğitim Kurumları</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style> bu sayfaada süreyi başlat diyince gelsin metin  
+  <style>
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
@@ -39,6 +39,7 @@
       font-size: 1.1rem;
       line-height: 1.6;
       text-align: justify;
+      display: none; /* Başlangıçta gizli */
     }
     .controls {
       margin-top: 2rem;
@@ -75,7 +76,7 @@
     <div class="controls">
       <button class="btn" onclick="startReading()" id="startBtn">Okumaya Başla</button>
       <button class="btn" onclick="finishReading()" id="finishBtn" style="display:none;">Bitirdim</button>
-      <div id="timer">Süre: 0 saniye</div>
+      <div id="timer" style="display:none;">Süre: 0 saniye</div>
     </div>
   </div>
 
@@ -96,24 +97,30 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function fetchText() {
+    let startTime, timerInterval;
+
+    async function fetchAndShowText() {
       const docRef = doc(db, "ayarlar", "okumaMetni");
       const docSnap = await getDoc(docRef);
+      const readingText = document.getElementById("readingText");
+
       if (docSnap.exists()) {
-        document.getElementById("readingText").innerText = docSnap.data().metin;
+        readingText.innerText = docSnap.data().metin;
+        readingText.style.display = "block"; // Metni görünür yap
       } else {
-        document.getElementById("readingText").innerText = "Okuma metni bulunamadı.";
+        readingText.innerText = "Okuma metni bulunamadı.";
+        readingText.style.display = "block";
       }
     }
 
-    fetchText();
-
-    let startTime, timerInterval;
-
-    window.startReading = function () {
-      startTime = Date.now();
+    window.startReading = async function () {
       document.getElementById("startBtn").style.display = "none";
       document.getElementById("finishBtn").style.display = "inline-block";
+      document.getElementById("timer").style.display = "block";
+
+      await fetchAndShowText(); // Metni getir ve göster
+
+      startTime = Date.now();
 
       timerInterval = setInterval(() => {
         const elapsed = Math.floor((Date.now() - startTime) / 1000);
