@@ -2,8 +2,9 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pelikan Eğitim Kurumları</title>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -13,135 +14,180 @@
       display: flex;
       justify-content: center;
     }
+
     .container {
       background: #fff;
       padding: 2rem;
       border-radius: 12px;
       max-width: 700px;
       width: 100%;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
+
     h2 {
       text-align: center;
       color: #1A237E;
     }
+
     .question {
       margin-bottom: 20px;
     }
+
     .option {
-      margin: 4px 0;
+      margin: 5px 0;
     }
+
     .btn {
       margin-top: 20px;
-      display: inline-block;
-      padding: 12px 24px;
+      padding: 12px;
       background-color: #FFA000;
       color: white;
-      text-decoration: none;
       border-radius: 8px;
-      font-weight: bold;
-      text-align: center;
-      cursor: pointer;
       border: none;
       width: 100%;
+      font-weight: bold;
+      cursor: pointer;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h2>Okuma Soruları</h2>
-    <form id="soruForm"></form>
-    <button class="btn" onclick="kontrolEt()">Cevapları Kontrol Et</button>
-  </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+<div class="container">
+  <h2>Okuma Soruları</h2>
+  <form id="soruForm"></form>
+  <button class="btn" id="submitBtn">Cevapları Kontrol Et</button>
+</div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCLp-t81vU5S1LDr76YKszeG1LcHwU0GZQ",
-      authDomain: "okuma-testi.firebaseapp.com",
-      projectId: "okuma-testi",
-      storageBucket: "okuma-testi.firebasestorage.app",
-      messagingSenderId: "820936161658",
-      appId: "1:820936161658:web:0bd9c4dc043cfad0667ec3",
-      measurementId: "G-2WBL96ETV1"
-    };
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "okuma-testi.firebaseapp.com",
+  projectId: "okuma-testi"
+};
 
-    let dogruCevaplar = [];
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-    async function sorulariYukle() {
-      const docRef = doc(db, "questions", "0p5ZCRA6tUvLUvIEWlNg");
-      const docSnap = await getDoc(docRef);
+// 🔥 VERİYİ GÜVENLİ ÇEK
+let raw = sessionStorage.getItem("questions");
 
-      if (docSnap.exists()) {
-        const veri = docSnap.data();
-        const sorular = veri.sorular;
+if (!raw) {
+  alert("Sorular bulunamadı! Baştan başlat.");
+  window.location.href = "index.html";
+}
 
-        let formHTML = "";
+let questions;
 
-        sorular.forEach((soruObj, index) => {
-          dogruCevaplar.push(soruObj.cevap);
+try {
+  questions = JSON.parse(raw);
+} catch {
+  alert("Soru verisi bozuk!");
+  window.location.href = "index.html";
+}
 
-          formHTML += `<div class="question">
-            <p><strong>${index + 1}. ${soruObj.soru}</strong></p>`;
+if (!questions || questions.length === 0) {
+  alert("Sorular boş!");
+  window.location.href = "index.html";
+}
 
-          // Boş bırak seçeneği
-          formHTML += `<div class="option">
-            <label><input type="radio" name="soru${index}" value=""> Boş bırak</label>
-          </div>`;
+const form = document.getElementById("soruForm");
+const submitBtn = document.getElementById("submitBtn");
 
-          soruObj.secenekler.forEach((secenek) => {
-            formHTML += `<div class="option">
-              <label><input type="radio" name="soru${index}" value="${secenek}"> ${secenek}</label>
-            </div>`;
-          });
+let dogruCevaplar = [];
 
-          formHTML += `</div>`;
-        });
+// 🔥 SORULARI BAS
+questions.forEach((q, index) => {
+  dogruCevaplar.push(q.cevap);
 
-        document.getElementById("soruForm").innerHTML = formHTML;
-      } else {
-        document.getElementById("soruForm").innerHTML = "<p>Sorular yüklenemedi.</p>";
-      }
+  let html = `<div class="question">
+    <p><strong>${index + 1}. ${q.soru}</strong></p>`;
+
+  html += `
+    <div class="option">
+      <label>
+        <input type="radio" name="soru${index}" value="">
+        Boş bırak
+      </label>
+    </div>
+  `;
+
+  q.secenekler.forEach((secenek, i) => {
+    html += `
+      <div class="option">
+        <label>
+          <input type="radio" name="soru${index}" value="${i}">
+          ${secenek}
+        </label>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  form.innerHTML += html;
+});
+
+// 🔥 BUTON EVENT
+submitBtn.addEventListener("click", kontrolEt);
+
+// 🔥 KONTROL
+async function kontrolEt() {
+
+  let dogru = 0;
+  let yanlis = 0;
+  let eksikVar = false;
+
+  dogruCevaplar.forEach((cevap, i) => {
+    const secilen = document.querySelector(`input[name='soru${i}']:checked`);
+
+    if (!secilen) {
+      eksikVar = true;
+      return;
     }
 
-    window.kontrolEt = function () {
-      let dogru = 0;
-      let yanlis = 0;
-      let eksikVar = false;
+    const deger = secilen.value;
 
-      dogruCevaplar.forEach((cevap, i) => {
-        const secilen = document.querySelector(`input[name='soru${i}']:checked`);
-        const deger = secilen ? secilen.value : "";
+    if (deger === "") {
+      // boş
+    } else if (parseInt(deger) === cevap) {
+      dogru++;
+    } else {
+      yanlis++;
+    }
+  });
 
-        if (secilen === null) {
-          eksikVar = true;
-        } else if (deger === "") {
-          // Boş bırakıldı, sayılmaz
-        } else if (deger === cevap) {
-          dogru++;
-        } else {
-          yanlis++;
-        }
+  if (eksikVar) {
+    alert("Tüm soruları işaretleyin (boş bırak dahil)");
+    return;
+  }
+
+  const yuzde = ((dogru / dogruCevaplar.length) * 100).toFixed(1);
+
+  localStorage.setItem("dogruSayisi", dogru);
+  localStorage.setItem("yanlisSayisi", yanlis);
+  localStorage.setItem("basariYuzdesi", yuzde);
+
+  const userId = localStorage.getItem("userId");
+
+  if(userId){
+    try{
+      await updateDoc(doc(db, "demo_kayitlari", userId), {
+        dogruSayisi: dogru,
+        yanlisSayisi: yanlis,
+        basariYuzdesi: Number(yuzde),
+        tamamlandi: true,
+        bitisTarihi: new Date()
       });
-
-      if (eksikVar) {
-        alert("Lütfen tüm sorulara cevap veriniz. Her soru için 'Boş bırak' seçeneği de vardır.");
-        return;
-      }
-
-      localStorage.setItem("dogruSayisi", dogru);
-      localStorage.setItem("yanlisSayisi", yanlis);
-      localStorage.setItem("basariYuzdesi", ((dogru / dogruCevaplar.length) * 100).toFixed(1));
-
-      window.location.href = "result.html";
+    }catch(err){
+      console.error("Firebase hata:", err);
     }
+  }
 
-    sorulariYukle();
-  </script>
+  window.location.href = "result.html";
+}
+</script>
+
 </body>
 </html>

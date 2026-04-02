@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pelikan Eğitim Kurumları</title>
+
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -17,6 +19,7 @@
       min-height: 100vh;
       padding: 1rem;
     }
+
     .container {
       background-color: white;
       padding: 2.5rem;
@@ -25,22 +28,18 @@
       width: 100%;
       max-width: 480px;
       text-align: center;
-      animation: fadeIn 0.6s ease-in-out;
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+
     h1 {
       color: #0D47A1;
-      margin-bottom: 0.3rem;
       font-size: 1.8rem;
     }
+
     p.description {
-      font-size: 1rem;
       margin-bottom: 2rem;
       color: #333;
     }
+
     label {
       font-weight: 600;
       color: #0D47A1;
@@ -48,75 +47,161 @@
       text-align: left;
       margin-top: 1rem;
     }
-    input {
+
+    input, select {
       width: 100%;
       padding: 0.6rem;
       border: 1px solid #ccc;
       border-radius: 6px;
       margin-top: 0.3rem;
     }
+
+    .kvkk {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+      font-size: 13px;
+      text-align: left;
+    }
+
     button {
       background-color: #F57C00;
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 0.75rem;
       border-radius: 6px;
       margin-top: 1.2rem;
       cursor: pointer;
       font-size: 1rem;
-      transition: background-color 0.3s ease;
+      width: 100%;
     }
-    button:hover {
-      background-color: #ef6c00;
-    }
+
     img.logo {
       width: 200px;
       margin-bottom: 1.2rem;
     }
+
     footer {
       margin-top: 2rem;
-      text-align: center;
       color: #fff;
       font-size: 0.85rem;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <img src="logo.jpg" alt="Pelikan Logo" class="logo">
-    <h1>Hızlı Okuma ve Okuduğunu Anlama Ölçüm Metni</h1>
-    <p class="description">Bu test, öğrencinin okuma hızını ve anlama düzeyini ölçmek amacıyla hazırlanmıştır. Lütfen bilgilerinizi girerek devam edin.</p>
 
-    <form id="studentForm">
-      <label for="name">Ad Soyad:</label>
-      <input type="text" id="name" name="name" required pattern="^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$" title="Sadece harf giriniz.">
+<div class="container">
+  <img src="logo.jpg" class="logo">
 
-      <label for="grade">Yaş</label>
-      <input type="number" id="grade" name="grade" required min="3" max="40" title="Lütfen geçerli bir yaş girin.">
+  <h1>Hızlı Okuma ve Anlama Testi</h1>
+  <p class="description">Bilgilerinizi girerek teste başlayınız.</p>
 
-      <button type="submit">Başla</button>
-    </form>
-  </div>
-  <footer>
-    &copy; 2025 Tüm hakları saklıdır. Bu uygulama Pelikan Eğitim Kurumları'na aittir.
-  </footer>
+  <form id="studentForm">
 
-  <script>
-    document.getElementById('studentForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const nameInput = document.getElementById('name');
-      const nameRegex = /^[A-Za-zÇçĞğİıÖöŞşÜü\s]+$/;
+    <label>Ad Soyad</label>
+    <input type="text" id="name" required>
 
-      if (!nameRegex.test(nameInput.value)) {
-        alert('Lütfen sadece harf giriniz.');
-        nameInput.focus();
-        return;
-      }
+    <label>Yaş</label>
+    <input type="number" id="age" required>
 
-      localStorage.setItem('studentName', nameInput.value);
-      localStorage.setItem('studentGrade', document.getElementById('grade').value);
-      window.location.href = 'reading.html';
+    <label>Telefon</label>
+    <input type="tel" id="phone" required>
+
+    <label>Sınıf</label>
+    <select id="sinif" required>
+      <option value="">Seçiniz</option>
+      <option value="3">3. Sınıf</option>
+      <option value="4">4. Sınıf</option>
+      <option value="5">5. Sınıf</option>
+      <option value="6">6. Sınıf</option>
+      <option value="7">7. Sınıf</option>
+      <option value="8">8. Sınıf</option>
+    </select>
+
+    <div class="kvkk">
+      <input type="checkbox" id="kvkk">
+      <span>KVKK kapsamında verilerimin işlenmesine onay veriyorum.</span>
+    </div>
+
+    <button type="submit">Teste Başla</button>
+
+  </form>
+</div>
+
+<footer>
+  © 2025 Pelikan Eğitim Kurumları
+</footer>
+
+<script src="data.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "okuma-testi.firebaseapp.com",
+  projectId: "okuma-testi"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+function sinifToGrup(s){
+  if(s==3||s==4) return "grup1";
+  if(s==5||s==6) return "grup2";
+  if(s==7||s==8) return "grup3";
+}
+
+document.getElementById('studentForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+
+  const name = document.getElementById('name').value.trim();
+  const age = Number(document.getElementById('age').value);
+  const phone = document.getElementById('phone').value.trim();
+  const sinif = document.getElementById('sinif').value;
+  const kvkk = document.getElementById('kvkk').checked;
+
+  if(!name || !age || !phone || !sinif){
+    alert("Tüm alanları doldur!");
+    return;
+  }
+
+  if(!kvkk){
+    alert("KVKK onayı zorunlu!");
+    return;
+  }
+
+  try {
+
+    const docRef = await addDoc(collection(db, "demo_kayitlari"), {
+      adSoyad: name,
+      yas: age,
+      telefon: phone,
+      sinif: sinif,
+      kvkkOnayi: true,
+      kayitTarihi: serverTimestamp()
     });
-  </script>
+
+    // 🔥 USER ID
+    localStorage.setItem("userId", docRef.id);
+
+    // Metin
+    const grup = sinifToGrup(sinif);
+    const data = veri[grup];
+
+    sessionStorage.setItem("metin", data.text);
+    sessionStorage.setItem("questions", JSON.stringify(data.questions));
+
+    window.location.href = "reading.html";
+
+  } catch(err){
+    alert("Hata: " + err.message);
+  }
+
+});
+</script>
+
 </body>
 </html>

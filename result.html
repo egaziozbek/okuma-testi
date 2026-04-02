@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Pelikan Eğitim Kurumları</title>
+
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -13,6 +14,7 @@
       display: flex;
       justify-content: center;
     }
+
     .container {
       background: #fff;
       padding: 2rem;
@@ -21,24 +23,29 @@
       width: 100%;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
+
     h2 {
       text-align: center;
       color: #1A237E;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
     }
+
     th, td {
       border: 1px solid #ddd;
       padding: 12px;
       text-align: center;
     }
+
     th {
       background-color: #1A237E;
       color: white;
     }
+
     .info-text {
       margin-top: 30px;
       font-size: 16px;
@@ -46,75 +53,83 @@
       line-height: 1.6;
       text-align: center;
     }
-    .info-text p {
-      margin: 10px 0;
-    }
+
     .highlight {
       font-weight: bold;
       color: #1A237E;
     }
-    .demo-button {
+
+    .exit-button {
       margin-top: 20px;
       display: inline-block;
       padding: 12px 24px;
       background-color: #FFA000;
       color: white;
-      text-decoration: none;
       border-radius: 8px;
       font-weight: bold;
       text-align: center;
+      cursor: pointer;
     }
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <h2>Test Sonuçları</h2>
-    <table>
-      <tr>
-        <th>Okuma Hızı</th>
-        <th>Doğru Sayısı</th>
-        <th>Yanlış Sayısı</th>
-        <th>Başarı Yüzdesi</th>
-      </tr>
-      <tr>
-        <td id="okumaHiziCell">-</td>
-        <td id="dogruCell">0</td>
-        <td id="yanlisCell">0</td>
-        <td id="yuzdeCell">-</td>
-      </tr>
-    </table>
 
-    <div class="info-text">
-      <p>
-        Pelikan Eğitim Kurumlarında <span class="highlight">Hızlı Okuma ve Okuduğunu Anlama Eğitimi</span> alarak, okuma hızınızı dakikada <strong>350 kelimeye</strong> çıkarabilirsiniz. Bunu yaparken gerçekleştirdiğimiz <strong>okuma anlama teknikleri</strong> ile birlikte, algı düzeyinizi ve odaklanma becerinizi de geliştirip okuduğunu anlama oranınızı en üst seviyeye çıkarabilirsiniz.
-      </p>
-      <p class="highlight">ZİHNİNİ HIZLANDIR. ZAMAN RAKİBİN OLMASIN.</p>
-    </div>
+<div class="container">
+  <h2>Test Sonuçları</h2>
 
-    <div style="text-align:center;">
-      <a href="demo-kayit.html" class="demo-button">Ücretsiz Online Demo Ders Kayıt</a>
-    </div>
+  <table>
+    <tr>
+      <th>Okuma Hızı</th>
+      <th>Doğru Sayısı</th>
+      <th>Yanlış Sayısı</th>
+      <th>Başarı Yüzdesi</th>
+    </tr>
+    <tr>
+      <td id="okumaHiziCell">-</td>
+      <td id="dogruCell">0</td>
+      <td id="yanlisCell">0</td>
+      <td id="yuzdeCell">-</td>
+    </tr>
+  </table>
+
+  <div class="info-text">
+    <p>
+      Pelikan Eğitim Kurumlarında <span class="highlight">Hızlı Okuma ve Okuduğunu Anlama Eğitimi</span> alarak,
+      okuma hızınızı geliştirebilirsiniz.
+    </p>
+    <p class="highlight">ZİHNİNİ HIZLANDIR. ZAMAN RAKİBİN OLMASIN.</p>
   </div>
 
-  <script>
-    const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
-    const readingTime = parseInt(localStorage.getItem("readingTime")) || 1;
-    const dogru = parseInt(localStorage.getItem("dogruSayisi")) || 0;
-    const yanlis = parseInt(localStorage.getItem("yanlisSayisi")) || 0;
+  <div style="text-align:center;">
+    <div class="exit-button" onclick="cikisYap()">Çıkış</div>
+  </div>
+</div>
 
-    const toplamSoru = dogru + yanlis;
-    const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100) : "-";
-    const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
+<script>
+  const kelimeSayisi = parseInt(localStorage.getItem("kelimeSayisi")) || 0;
+  const readingTime = parseInt(localStorage.getItem("readingTime")) || 1;
+  const dogru = parseInt(localStorage.getItem("dogruSayisi")) || 0;
+  const yanlis = parseInt(localStorage.getItem("yanlisSayisi")) || 0;
 
-    document.getElementById("okumaHiziCell").textContent = `Dakikada ${okumaHizi} kelime`;
-    document.getElementById("dogruCell").textContent = dogru;
-    document.getElementById("yanlisCell").textContent = yanlis;
-    document.getElementById("yuzdeCell").textContent = yuzde !== "-" ? `%${yuzde}` : "-";
+  const toplamSoru = dogru + yanlis;
+  const yuzde = toplamSoru > 0 ? Math.round((dogru / toplamSoru) * 100) : "-";
+  const okumaHizi = Math.round((kelimeSayisi * 60) / readingTime);
 
-    localStorage.setItem("okumaSonucu", JSON.stringify({
-      okumaHizi,
-      yuzde
-    }));
-  </script>
+  document.getElementById("okumaHiziCell").textContent = `Dakikada ${okumaHizi} kelime`;
+  document.getElementById("dogruCell").textContent = dogru;
+  document.getElementById("yanlisCell").textContent = yanlis;
+  document.getElementById("yuzdeCell").textContent = yuzde !== "-" ? `%${yuzde}` : "-";
+
+  function cikisYap(){
+    // 🔥 TÜM VERİYİ TEMİZLE
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // 🔥 SİTEYE YÖNLENDİR
+    window.location.href = "https://www.pelikanegitim.com";
+  }
+</script>
+
 </body>
 </html>
